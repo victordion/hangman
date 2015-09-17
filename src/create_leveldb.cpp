@@ -7,6 +7,7 @@ using namespace std;
 
 const int num_kb = 96;
 
+/*
 int main() {
   leveldb::DB* db[num_kb];
   leveldb::Options options;
@@ -22,4 +23,4 @@ int main() {
 
   return 0;
 }
-
+*/
