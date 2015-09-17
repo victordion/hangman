@@ -29,6 +29,7 @@
 //#define DEBUG_MEDIUM                (20)
 //#define DEBUG_LOW                   (10)
 //#define DEBUG_MEM                   (60)
+
 #define THREAD_INPUT_WORD       wconf_input.input_word
 #define THREAD_RECALL_WORD      wconf_input.recall_word
 #define THREAD_LEX_ARRAY_WORD   wconf_input.lexicon_array_word
@@ -89,8 +90,8 @@
 
 #define LONG_HASH_SIZE             (2097152)
 #define LOG_HASH_SIZE              (2)
-#define MAX_LEX_SENTENCE           (3*DEFAULT_SENTENCE_LENGTH - 1)
-#define MAX_DICTIONARY_SIZE     (500000)
+#define MAX_LEX_SENTENCE           (3 * DEFAULT_SENTENCE_LENGTH - 1)
+#define MAX_DICTIONARY_SIZE        (500000)
 
 
 #define NO_ACTION               (0)
@@ -111,8 +112,8 @@ struct kb_row_entry{
 
 
 struct KB_entry {
-    int target_id;
-    float KB_value;
+	int target_id;
+	float KB_value;
 };
 
 struct candidate_entry {
@@ -126,30 +127,27 @@ struct input_word_entry {
 };
 
 struct wconf_input_entry{
-    struct input_word_entry input_word[DEFAULT_WORD_LENGTH];
-    int lexicon_array_word[MAX_LEX_WORD][MAX_AMBIGUOUS];
-    int candidate_size_word[MAX_LEX_WORD];
-    int sentence_count;
-    int total_words_count;
-    int word_count;
-    int current_recall_size_word;
-    char **recall_word;
+	struct input_word_entry input_word[DEFAULT_WORD_LENGTH];
+	int lexicon_array_word[MAX_LEX_WORD][MAX_AMBIGUOUS];
+	int candidate_size_word[MAX_LEX_WORD];
+	int sentence_count;
+	int total_words_count;
+	int word_count;
+	int current_recall_size_word;
+	char **recall_word;
 };
-
 
 typedef  unsigned long int  u4;   /* unsigned 4-byte type */
 typedef  unsigned     char  u1;   /* unsigned 1-byte type */
 
-
-
 struct hash_entry {
-    int sym_id;
-    struct hash_entry *next_ptr;
+	int sym_id;
+	struct hash_entry *next_ptr;
 };
 
 struct sentence_lex_table_entry {
-        int *lex_list;
-        int symbol_size;
+	int *lex_list;
+	int symbol_size;
 };
 
 struct input_sentence_entry {
@@ -158,8 +156,8 @@ struct input_sentence_entry {
 };
 
 struct sentence_word_entry {
-        char *str;
-        int valid;
+	char *str;
+	int valid;
 };
 
 #endif

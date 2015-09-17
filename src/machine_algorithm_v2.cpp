@@ -116,74 +116,73 @@ void initialize(void)
 
 	int input;
 
-    int i, j, k, stop;
-    int adjusted;
-    int rc; 
+	int i, j, k, stop;
+	int adjusted;
+	int rc; 
 
 	srand(time(NULL));
 
-    out_fp = fopen("out_word.txt","w");
-    if (out_fp == NULL)
-    {
-        printf("cannot open out_word.txt to write\n");
-        exit(0);
-    }
+	out_fp = fopen("out_word.txt","w");
+	if (out_fp == NULL)
+	{
+		printf("cannot open out_word.txt to write\n");
+		exit(0);
+	}
 
-    out_fp_sentence = fopen("out_sentence.txt","w");
-    if (out_fp_sentence == NULL)
-    {
-        printf("cannot open out_sentence.txt to write\n");
-        exit(0);
-    }
+	out_fp_sentence = fopen("out_sentence.txt","w");
+	if (out_fp_sentence == NULL)
+	{
+		printf("cannot open out_sentence.txt to write\n");
+		exit(0);
+	}
 
-    // clear the word and sentence knowledge base
+	// clear the word and sentence knowledge base
 	l_start = clock();
 	initialize_word();
 	initialize_sentence();
 
 	read_KB_word();
-	#ifdef DEBUG_ALL
+#ifdef DEBUG_ALL
 	printf("done reading word KB\n");
-	#endif
+#endif
 
 	read_KB_sentence();
-	#ifdef DEBUG_ALL
+#ifdef DEBUG_ALL
 	printf("done reading sentence KB\n");
-	#endif
+#endif
 	l_end = clock();
-	#ifdef DEBUG_TIME
+#ifdef DEBUG_TIME
 	printf("Load time %.6lf seconds\n", ((double)(l_end - l_start))/CLOCKS_PER_SEC);
-	#endif
+#endif
 
 }
 
-char machine(char * sentence, std::vector<char> selected, char &letter, char * guess, std::vector<std::string>& guessed_sentence)
-{
+char machine(const std::string masked_sentence, std::vector<char> selected,
+		char & letter, std::string & guess, const std::vector<std::string>& guessed_sentences) {
 	int OCF = 0;
-	char str_tok[2048];
+	std::string str_tok;
 	int word_count, word_len, word_number;
-	char * pch;
+	std::string pch;
 
 	clear_sentence(0);
 	// Update letter candidate index
 	int selected_size = selected.size();
-	int i;
-	for(i = 0; i < 26; i++)
+	for(int i = 0; i < 26; i++)
 	{
 		letter_select_frequency[i] = 0.0;
 		letter_select_candidate[i] = 0;
 	}
-	for(i=0;i<selected_size;i++)
+	for(int i = 0; i < selected_size; i++)
 	{
 		letter_select_frequency[i] = 0.0;
 		letter_select_candidate[selected[i] - 'a'] = -1;
 	}
 
 	// Count numbers of candidates for each word
-	strcpy(str_tok, sentence);
+	str_tok =  masked_sentence;
 	word_count = 0;
 	OCF = 0;
-	pch = strtok(str_tok, " \n");
+	pch = str_tok;
 	while(pch != NULL)
 	{
 		word_len = strlen(pch);
@@ -201,13 +200,13 @@ char machine(char * sentence, std::vector<char> selected, char &letter, char * g
 	{
 		// Uncomment for Syed's Letter Confab
 		/*if(sentence_confab_v2(0,word_number))
-		{
+			{
 			if(letter_select_v1(recall_sentence, letter, selected))
 			{
-				free_input_sentence(0);
-				return 'N';
+			free_input_sentence(0);
+			return 'N';
 			}
-		}
+			}
 		//End*/
 		letter_select(sentence, letter);
 		//std::cout<<"Letter guessed by Wei's algo: "<<letter<<std::endl;
@@ -226,13 +225,13 @@ char machine(char * sentence, std::vector<char> selected, char &letter, char * g
 			{
 				// Uncomment for Syed's Letter Confab
 				/*if(sentence_confab_v2(0,word_number))
-				{
+					{
 					if(letter_select_v1(recall_sentence, letter, selected))
 					{
-						free_input_sentence(0);
-						return 'N';
+					free_input_sentence(0);
+					return 'N';
 					}
-				}
+					}
 				//End*/
 				letter_select(sentence, letter);
 				//std::cout<<"Letter guessed by Wei's algo: "<<letter<<std::endl;
@@ -245,7 +244,7 @@ char machine(char * sentence, std::vector<char> selected, char &letter, char * g
 	}
 }
 
-char machine_two(char * sentence, std::vector<char> selected, char &letter, char * guess, std::vector<std::string>& guessed_sentence)
+char machine_two(const std::string sentence, std::vector<char> selected, char &letter, char * guess, std::vector<std::string>& guessed_sentence)
 {
 	int OCF = 0;
 	char str_tok[2048];
@@ -253,22 +252,22 @@ char machine_two(char * sentence, std::vector<char> selected, char &letter, char
 	char * pch;
 	int unknown_char=0,total_char=0,total_conf_char=0, word_number=0;
 	clear_sentence(0);
+
 	// Update letter candidate index
 	int selected_size = selected.size();
-	int i;
-	for(i = 0; i < 26; i++)
-	{
+
+	for(int i = 0; i < 26; i++) {
 		letter_select_frequency[i] = 0.0;
 		letter_select_candidate[i] = 0;
 	}
-	for(i=0;i<selected_size;i++)
+	for(int i = 0; i < selected_size; i++)
 	{
 		letter_select_frequency[i] = 0.0;
 		letter_select_candidate[selected[i] - 'a'] = -1;
 	}
-	
+
 	//Get unknown chars and total chars
-	for(i=0;sentence[i]!='\0';i++)
+	for(int i = 0; i < sentence.length(); i++)
 	{
 		if(sentence[i]==' ')
 			continue;
@@ -276,7 +275,7 @@ char machine_two(char * sentence, std::vector<char> selected, char &letter, char
 			unknown_char++;
 		total_char++;
 	}
-	
+
 	// Count numbers of candidates for each word
 	strcpy(str_tok, sentence);
 	word_count = 0;
@@ -295,12 +294,12 @@ char machine_two(char * sentence, std::vector<char> selected, char &letter, char
 	}
 	//std::cout<<"Sentence: "<<sentence<<std::endl;
 	if(sentence_confab_v2(0,word_number)&&((total_char/unknown_char)>=2))	//Syed's Algorithm v2
-	//if(sentence_confab_v1(0)&&((total_char/unknown_char)>=2))				//Syed's Algorithm v1
+		//if(sentence_confab_v1(0)&&((total_char/unknown_char)>=2))				//Syed's Algorithm v1
 	{
 		//std::cout<<"Confab Sentence: "<<recall_sentence<<std::endl;
 		sentence_length_rec[0] = word_count;
 		free_input_sentence(0);
-		
+
 		//To calculate number of characters in confabulated sentence
 		total_conf_char=0;
 		for(i=0;recall_sentence[i]!='\0';i++)
@@ -315,18 +314,18 @@ char machine_two(char * sentence, std::vector<char> selected, char &letter, char
 			// Uncomment for Syed's Letter Confab
 			/*if(letter_select_v1(recall_sentence, letter, selected))
 				{
-					//std::cout<<"Recalled Sentence: "<<recall_sentence<<std::endl;
-					//std::cout<<"Letter guessed by Syed's algo: "<<letter<<std::endl;
-					free_input_sentence(0);
-					return 'N';
-				}
+			//std::cout<<"Recalled Sentence: "<<recall_sentence<<std::endl;
+			//std::cout<<"Letter guessed by Syed's algo: "<<letter<<std::endl;
+			free_input_sentence(0);
+			return 'N';
+			}
 			//End */
 			letter_select(sentence,letter);
 			//std::cout<<"Letter guessed by Wei's algo: "<<letter<<std::endl;
 			free_input_sentence(0);
 			return 'N';
 		}
-		
+
 		int guessed_size = guessed_sentence.size();
 		for(i = 0; i < guessed_size; i++)
 		{
@@ -335,11 +334,11 @@ char machine_two(char * sentence, std::vector<char> selected, char &letter, char
 				// Uncomment for Syed's Letter Confab
 				/*if(letter_select_v1(recall_sentence, letter, selected))
 					{
-						//std::cout<<"Recalled Sentence: "<<recall_sentence<<std::endl;
-						//std::cout<<"Letter guessed by Syed's algo: "<<letter<<std::endl;
-						free_input_sentence(0);
-						return 'N';
-					}
+				//std::cout<<"Recalled Sentence: "<<recall_sentence<<std::endl;
+				//std::cout<<"Letter guessed by Syed's algo: "<<letter<<std::endl;
+				free_input_sentence(0);
+				return 'N';
+				}
 				//End */
 				letter_select(sentence, letter);
 				//std::cout<<"Letter guessed by Wei's algo: "<<letter<<std::endl;
@@ -355,15 +354,15 @@ char machine_two(char * sentence, std::vector<char> selected, char &letter, char
 	{
 		// Uncomment for Syed's Letter Confab or Combination of Letter selection
 		/*if(letter_select_v1(recall_sentence, letter, selected))
-		{
-			//std::cout<<"Recalled Sentence: "<<recall_sentence<<std::endl;
-			//std::cout<<"Letter guessed by Syed's algo: "<<letter<<std::endl;
-			free_input_sentence(0);
-			return 'N';
+			{
+		//std::cout<<"Recalled Sentence: "<<recall_sentence<<std::endl;
+		//std::cout<<"Letter guessed by Syed's algo: "<<letter<<std::endl;
+		free_input_sentence(0);
+		return 'N';
 		}
 		else
 		//End of Syed's Letter Confab*/
-			letter_select(sentence, letter);
+		letter_select(sentence, letter);
 		//std::cout<<"Letter guessed by Wei's algo: "<<letter<<std::endl;
 		free_input_sentence(0);
 		return 'N';
@@ -372,13 +371,13 @@ char machine_two(char * sentence, std::vector<char> selected, char &letter, char
 
 void letter_select(char *str, char &letter)
 {
-    int str_len, i, max_id;
+	int str_len, i, max_id;
 	double max;
 	char slct;
 	str_len = strlen(str);
-	#ifdef DEBUG_SLCT
+#ifdef DEBUG_SLCT
 	printf("\n");
-	#endif
+#endif
 	if(money < 250)
 	{
 		letter_select_frequency['a'-'a'] = 0;
@@ -390,9 +389,9 @@ void letter_select(char *str, char &letter)
 	max = 0;
 	for(i=0;i<26;i++)
 	{
-		#ifdef DEBUG_SLCT
+#ifdef DEBUG_SLCT
 		printf("lc[%c] %f,", 'a'+i, letter_select_frequency[i]);
-		#endif
+#endif
 		if(letter_select_frequency[i] > max)
 		{
 			max = letter_select_frequency[i];
@@ -408,9 +407,9 @@ void letter_select(char *str, char &letter)
 		}while(letter_select_candidate[max_id] == -1);
 	}
 	slct = 'a' + max_id;
-	#ifdef DEBUG_SLCT
+#ifdef DEBUG_SLCT
 	printf("\nmaxid = %d, slct = %c\n", max_id, slct);
-	#endif
+#endif
 	letter_select_candidate[max_id] = -1;
 	for(i=0;i<26;i++)
 	{
@@ -421,36 +420,36 @@ void letter_select(char *str, char &letter)
 
 	// send selected letter
 	letter = slct;
-	#ifdef DEBUG_ALL
+#ifdef DEBUG_ALL
 	fprintf(out_fp_sentence,"Select %c: %s\n", slct, str);//letter_frequency[cnt],str);
 	printf("Select %c: %s\n", slct, str);// letter_frequency[cnt],str);
-	#endif
-	
+#endif
+
 }
 
 bool letter_select_v1(char *str, char&letter, std::vector<char> selected)
 {
 	/*int word=0;
-	for(int i=0;str[i]!='\0'; i++)
-	{
+		for(int i=0;str[i]!='\0'; i++)
+		{
 		if(word=word_number)
 		{
-			if(std::find(selected.begin(), selected.end(), str[i])==selected.end())
-			{	
-				letter = str[i];
-				return 1;
-			}
+		if(std::find(selected.begin(), selected.end(), str[i])==selected.end())
+		{	
+		letter = str[i];
+		return 1;
+		}
 		}
 		if(str[i]==' ')
 		word++;
-	}
-	return 0;
-	*/	
-	
-	
+		}
+		return 0;
+		*/	
+
+
 	for(int i=0; str[i]!='\0';i++)
 	{
-        //if (selected.find(str[i]))
+		//if (selected.find(str[i]))
 		if(std::find(selected.begin(), selected.end(), str[i])==selected.end())
 		{	
 			letter = str[i];
@@ -476,34 +475,34 @@ void output_word()
 	int org_size, org_valid;
 	char org_str;
 
-    int *total_words_count = &(wconf_input.total_words_count);
-    int *current_recall_size_word = &(wconf_input.current_recall_size_word);
+	int *total_words_count = &(wconf_input.total_words_count);
+	int *current_recall_size_word = &(wconf_input.current_recall_size_word);
 
 	for(dcount = 0; dcount < DEFAULT_WORD_LENGTH; dcount++) {
 		size[dcount] = THREAD_CDDT_SIZE_WORD[dcount];
-		#ifdef DEBUG_ALL
+#ifdef DEBUG_ALL
 		printf("size[%d] = %d\n", dcount, size[dcount]);
-		#endif
+#endif
 		if(size[dcount] > 1) {
 			if(ambiguity == 0) first_ambiguity = dcount;
 			ambiguity++;
 		}
 	}
-	
-	#ifdef DEBUG_ALL
+
+#ifdef DEBUG_ALL
 	printf("ambiguity = %d, first ambiguity = %d\n", ambiguity, first_ambiguity);
-	#endif
+#endif
 
 	if(ambiguity == 0 ) {
 		for(dcount = 0; dcount < DEFAULT_WORD_LENGTH; dcount++) {
-             if(THREAD_CDDT_SIZE_WORD[dcount] == 0) 
-                THREAD_RECALL_WORD[*total_words_count][dcount] = '`';
-             else if(symbol_list_word[dcount][THREAD_LEX_ARRAY_WORD[dcount][0]][0] != '`')  
+			if(THREAD_CDDT_SIZE_WORD[dcount] == 0) 
+				THREAD_RECALL_WORD[*total_words_count][dcount] = '`';
+			else if(symbol_list_word[dcount][THREAD_LEX_ARRAY_WORD[dcount][0]][0] != '`')  
 				THREAD_RECALL_WORD[*total_words_count][dcount] = symbol_list_word[dcount][THREAD_LEX_ARRAY_WORD[dcount][0]][0];
 			else 
 				THREAD_RECALL_WORD[*total_words_count][dcount] = '\0';
 		}
-    	THREAD_RECALL_WORD[*total_words_count][DEFAULT_WORD_LENGTH+1] = '\0';
+		THREAD_RECALL_WORD[*total_words_count][DEFAULT_WORD_LENGTH+1] = '\0';
 		(*total_words_count)++;
 		if(*total_words_count >= *current_recall_size_word) expand_recall_word();
 	}
@@ -525,15 +524,15 @@ void output_word()
 					else THREAD_RECALL_WORD[*total_words_count][dcount] = '\0';
 				}
 			}
-    		THREAD_RECALL_WORD[*total_words_count][DEFAULT_WORD_LENGTH+1] = '\0';
+			THREAD_RECALL_WORD[*total_words_count][DEFAULT_WORD_LENGTH+1] = '\0';
 			(*total_words_count)++;
 			if(*total_words_count >= *current_recall_size_word) expand_recall_word();
 		}
 	}
 	else {
-		#ifdef DEBUG_ALL
+#ifdef DEBUG_ALL
 		printf("AAA ambiguity = %d\n", ambiguity);
-		#endif
+#endif
 		org_size = THREAD_INPUT_WORD[first_ambiguity].candidate_size_word;
 		org_str = THREAD_INPUT_WORD[first_ambiguity].candidate[0].str;
 		org_valid = THREAD_INPUT_WORD[first_ambiguity].candidate[0].valid;
@@ -541,11 +540,11 @@ void output_word()
 		for(i = 0; i < size[first_ambiguity]; i++) {
 			if(symbol_list_word[first_ambiguity][THREAD_LEX_ARRAY_WORD[first_ambiguity][i]][0] == '`') {
 				continue;
-            }
+			}
 
 
 			THREAD_INPUT_WORD[first_ambiguity].candidate[0].str = 
-					symbol_list_word[first_ambiguity][THREAD_LEX_ARRAY_WORD[first_ambiguity][i]][0];
+				symbol_list_word[first_ambiguity][THREAD_LEX_ARRAY_WORD[first_ambiguity][i]][0];
 			THREAD_INPUT_WORD[first_ambiguity].candidate_size_word = 1;
 			THREAD_INPUT_WORD[first_ambiguity].candidate[0].valid = 1;
 
@@ -568,21 +567,21 @@ void output_word()
 void expand_recall_word()
 {
 	int i, new_size;
-    int *current_recall_size_word = &(wconf_input.current_recall_size_word);
+	int *current_recall_size_word = &(wconf_input.current_recall_size_word);
 
 	new_size = *current_recall_size_word + MAX_AMBIGUOUS*MAX_AMBIGUOUS;
-	#ifdef DEBUG_ALL
-    printf("WARNING: reallocate!!!\n");
-	#endif
-    exit(1);
+#ifdef DEBUG_ALL
+	printf("WARNING: reallocate!!!\n");
+#endif
+	exit(1);
 	THREAD_RECALL_WORD = (char **)realloc(THREAD_RECALL_WORD, sizeof(char *)*new_size);
 	for(i = *current_recall_size_word; i < new_size; i++) {
-        THREAD_RECALL_WORD[i] = (char *)malloc(sizeof(char)*DEFAULT_WORD_LENGTH);
-        if(THREAD_RECALL_WORD[i] == NULL) {
-            printf("ERROR: cannot allocate enough memory\n");
-            exit(0);
-        }
-    }
+		THREAD_RECALL_WORD[i] = (char *)malloc(sizeof(char)*DEFAULT_WORD_LENGTH);
+		if(THREAD_RECALL_WORD[i] == NULL) {
+			printf("ERROR: cannot allocate enough memory\n");
+			exit(0);
+		}
+	}
 	*current_recall_size_word = new_size;
 }
 
@@ -592,104 +591,104 @@ void free_word()
 	int i;
 
 	for(i = 0; i < DEFAULT_WORD_LENGTH; i++) {
-        if(wconf_input.input_word[i].candidate != NULL) {
-		    free(wconf_input.input_word[i].candidate);
+		if(wconf_input.input_word[i].candidate != NULL) {
+			free(wconf_input.input_word[i].candidate);
 
-            #ifdef DEBUG_MEM
-            printf("loc free 4 %x\n", wconf_input.input_word[i].candidate);
-            #endif
+#ifdef DEBUG_MEM
+			printf("loc free 4 %x\n", wconf_input.input_word[i].candidate);
+#endif
 
-            wconf_input.input_word[i].candidate = NULL;
-        }
+			wconf_input.input_word[i].candidate = NULL;
+		}
 		wconf_input.input_word[i].candidate_size_word = 0;
 	}
 
-    if(wconf_input.recall_word != NULL)
-    {
-        for(i=0;i<wconf_input.current_recall_size_word;i++)
-        {
-            if(wconf_input.recall_word[i] != NULL)
-            {
-                free(wconf_input.recall_word[i]);
-                wconf_input.recall_word[i] = NULL;
-            }
-        }
-        free(wconf_input.recall_word);
-        wconf_input.recall_word = NULL;
-    }
+	if(wconf_input.recall_word != NULL)
+	{
+		for(i=0;i<wconf_input.current_recall_size_word;i++)
+		{
+			if(wconf_input.recall_word[i] != NULL)
+			{
+				free(wconf_input.recall_word[i]);
+				wconf_input.recall_word[i] = NULL;
+			}
+		}
+		free(wconf_input.recall_word);
+		wconf_input.recall_word = NULL;
+	}
 }
 
 void clear_sentence(int sentence_id)
 {
-    int letter_count, word_count, i, j;
+	int letter_count, word_count, i, j;
 
-    for(word_count = 0; word_count < DEFAULT_SENTENCE_LENGTH; word_count++) {
-        if(input_sentence[sentence_id][word_count].word != NULL){
-          printf("SEVERE ERROR IN function clear!!! input_sentence.word != NULL\n");
-          exit(1);
-        }
-       	input_sentence[sentence_id][word_count].word = (struct sentence_word_entry *)malloc(sizeof(struct sentence_word_entry));
+	for(word_count = 0; word_count < DEFAULT_SENTENCE_LENGTH; word_count++) {
+		if(input_sentence[sentence_id][word_count].word != NULL){
+			printf("SEVERE ERROR IN function clear!!! input_sentence.word != NULL\n");
+			exit(1);
+		}
+		input_sentence[sentence_id][word_count].word = (struct sentence_word_entry *)malloc(sizeof(struct sentence_word_entry));
 
-        #ifdef DEBUG_MEM
-        printf("alloc 4 %x\n", input_sentence[sentence_id][word_count].word);
-        #endif
+#ifdef DEBUG_MEM
+		printf("alloc 4 %x\n", input_sentence[sentence_id][word_count].word);
+#endif
 
-        if(input_sentence[sentence_id][word_count].word == NULL) {
-            printf("ERROR: NOT ENOUGH MEMORY\n");
-            exit(0);
-        }
-       	(input_sentence[sentence_id][word_count].word)[0].str = (char *)malloc(sizeof(char)*(strlen("`")+2));
+		if(input_sentence[sentence_id][word_count].word == NULL) {
+			printf("ERROR: NOT ENOUGH MEMORY\n");
+			exit(0);
+		}
+		(input_sentence[sentence_id][word_count].word)[0].str = (char *)malloc(sizeof(char)*(strlen("`")+2));
 
-        #ifdef DEBUG_MEM
-        printf("alloc 5 %x\n", (input_sentence[sentence_id][word_count].word)[0].str);
-        #endif
+#ifdef DEBUG_MEM
+		printf("alloc 5 %x\n", (input_sentence[sentence_id][word_count].word)[0].str);
+#endif
 
-        if((input_sentence[sentence_id][word_count].word)[0].str == NULL) {
-            printf("ERROR: NOT ENOUGH MEMORY\n");
-            exit(0);
-        }
-       	strcpy((input_sentence[sentence_id][word_count].word)[0].str, "`");
-       	(input_sentence[sentence_id][word_count].word)[0].valid=1;
-       	input_sentence[sentence_id][word_count].size=1;
+		if((input_sentence[sentence_id][word_count].word)[0].str == NULL) {
+			printf("ERROR: NOT ENOUGH MEMORY\n");
+			exit(0);
+		}
+		strcpy((input_sentence[sentence_id][word_count].word)[0].str, "`");
+		(input_sentence[sentence_id][word_count].word)[0].valid=1;
+		input_sentence[sentence_id][word_count].size=1;
 
-        unknown_count[sentence_id][word_count] = 0;
+		unknown_count[sentence_id][word_count] = 0;
 
-   }
+	}
 }
 void clear_word()
 {
-    int i;
+	int i;
 
-    wconf_input.recall_word = (char**)malloc(sizeof(char *)*MAX_AMBIGUOUS*MAX_AMBIGUOUS);
-    if (wconf_input.recall_word == NULL)
-    {
-        printf("recall word mem error\n");
-        exit(0);
-    }
+	wconf_input.recall_word = (char**)malloc(sizeof(char *)*MAX_AMBIGUOUS*MAX_AMBIGUOUS);
+	if (wconf_input.recall_word == NULL)
+	{
+		printf("recall word mem error\n");
+		exit(0);
+	}
 
-    wconf_input.current_recall_size_word = MAX_AMBIGUOUS*MAX_AMBIGUOUS;
-    wconf_input.total_words_count = 0;
-    for(i=0;i<wconf_input.current_recall_size_word;i++)
-    {
-        wconf_input.recall_word[i] = (char *)malloc(sizeof(char)*DEFAULT_WORD_LENGTH);
-        if(wconf_input.recall_word[i] == NULL)
-        {
-            printf("recall word %d mem error\n", i);
-            exit(0);
-        }
-    }
+	wconf_input.current_recall_size_word = MAX_AMBIGUOUS*MAX_AMBIGUOUS;
+	wconf_input.total_words_count = 0;
+	for(i=0;i<wconf_input.current_recall_size_word;i++)
+	{
+		wconf_input.recall_word[i] = (char *)malloc(sizeof(char)*DEFAULT_WORD_LENGTH);
+		if(wconf_input.recall_word[i] == NULL)
+		{
+			printf("recall word %d mem error\n", i);
+			exit(0);
+		}
+	}
 }
 
 
 int collect_wconf_results(char * str, int word_count)
 {
-    int sid, wid, i,j,k, total_words_num, word_num,flag, word_len, letter_index;
+	int sid, wid, i,j,k, total_words_num, word_num,flag, word_len, letter_index;
 	char dic_str[2048];
 	int * candidate_index;
 
-    sid = 0;
-    wid = word_count;
-    total_words_num = 0;
+	sid = 0;
+	wid = word_count;
+	total_words_num = 0;
 
 
 	candidate_index = (int *)malloc(sizeof(int)*global_dictionary_size);
@@ -717,7 +716,7 @@ int collect_wconf_results(char * str, int word_count)
 			if(flag == 1)
 			{
 				//printf("word_count %d candidate num %d, %s\n", word_count, total_words_num, dictionary[(lex_table_sentence[word_count].lex_list)[i]]);
-                //printf("matched string %s\n", dic_str);
+				//printf("matched string %s\n", dic_str);
 				total_words_num++;
 				candidate_index[i] = 1;
 				for(j=0;j<word_len;j++)
@@ -750,49 +749,49 @@ int collect_wconf_results(char * str, int word_count)
 	printf("word_count %d, candidate num = %d\n",word_count, total_words_num);
 #endif
 
-	
+
 	if(total_words_num > MAX_WORD_CANDIDATE || total_words_num < 1e-8)
 	{
 		return 1;
 	}
 
-    //by qqiu Nov. 2010
-    if(input_sentence[sid][wid].word != NULL) {
-        for(i = 0; i < input_sentence[sid][wid].size; i++) {
-            if((input_sentence[sid][wid].word)[i].str != NULL) {
-                free((input_sentence[sid][wid].word)[i].str);
+	//by qqiu Nov. 2010
+	if(input_sentence[sid][wid].word != NULL) {
+		for(i = 0; i < input_sentence[sid][wid].size; i++) {
+			if((input_sentence[sid][wid].word)[i].str != NULL) {
+				free((input_sentence[sid][wid].word)[i].str);
 
-                #ifdef DEBUG_MEM
-                printf("loc free 6 %x\n", (input_sentence[sid][wid].word)[i].str);
-                #endif
+#ifdef DEBUG_MEM
+				printf("loc free 6 %x\n", (input_sentence[sid][wid].word)[i].str);
+#endif
 
-                (input_sentence[sid][wid].word)[i].str = NULL;
-            }
-        } 
-        free(input_sentence[sid][wid].word);
+				(input_sentence[sid][wid].word)[i].str = NULL;
+			}
+		} 
+		free(input_sentence[sid][wid].word);
 
-        #ifdef DEBUG_MEM
-        printf("loc free 7 %x\n", input_sentence[sid][wid].word);
-        #endif
+#ifdef DEBUG_MEM
+		printf("loc free 7 %x\n", input_sentence[sid][wid].word);
+#endif
 
-        input_sentence[sid][wid].word = NULL;
-    }
-    //***** set sentence input****//
-    input_sentence[sid][wid].size = total_words_num;
-    if(input_sentence[sid][wid].word != NULL) {
-      printf("SEVERE ERROR!!! input_sentence.word != NULL\n");
-      exit(1);
-    }
-    input_sentence[sid][wid].word = (struct sentence_word_entry *)malloc(sizeof(struct sentence_word_entry)*(total_words_num==0?1:total_words_num)); 
+		input_sentence[sid][wid].word = NULL;
+	}
+	//***** set sentence input****//
+	input_sentence[sid][wid].size = total_words_num;
+	if(input_sentence[sid][wid].word != NULL) {
+		printf("SEVERE ERROR!!! input_sentence.word != NULL\n");
+		exit(1);
+	}
+	input_sentence[sid][wid].word = (struct sentence_word_entry *)malloc(sizeof(struct sentence_word_entry)*(total_words_num==0?1:total_words_num)); 
 
-    #ifdef DEBUG_MEM
-    printf("alloc 7 %x\n", input_sentence[sid][wid].word);
-    #endif
+#ifdef DEBUG_MEM
+	printf("alloc 7 %x\n", input_sentence[sid][wid].word);
+#endif
 
-    if(input_sentence[sid][wid].word == NULL) {
-        printf("ERROR: NOT ENOUGH MEMORY\n");
-        exit(0);
-    }
+	if(input_sentence[sid][wid].word == NULL) {
+		printf("ERROR: NOT ENOUGH MEMORY\n");
+		exit(0);
+	}
 	if(total_words_num > 0)
 	{
 		k = 0;
@@ -801,9 +800,9 @@ int collect_wconf_results(char * str, int word_count)
 			{
 				(input_sentence[sid][wid].word)[k].str = (char *)malloc(sizeof(char)*(strlen(dictionary[i])+1) ); 
 
-				#ifdef DEBUG_MEM
+#ifdef DEBUG_MEM
 				printf("alloc 8 %x\n", (input_sentence[sid][wid].word)[k].str);
-				#endif
+#endif
 
 				if((input_sentence[sid][wid].word)[k].str == NULL) {
 					printf("ERROR: NOT ENOUGH MEMORY\n");
@@ -821,56 +820,56 @@ int collect_wconf_results(char * str, int word_count)
 		strcpy((input_sentence[sid][wid].word)[0].str, str);
 		(input_sentence[sid][wid].word)[0].valid=1; 
 	}
-		
-    #ifdef DEBUG_MEDIUM 
-    fprintf(out_fp, "##### sentence %d word %d size %d length %d\n", 
-        sid, wid, input_sentence[sid][wid].size, word_length_rec[sid][wid] ); 
-    #endif
+
+#ifdef DEBUG_MEDIUM 
+	fprintf(out_fp, "##### sentence %d word %d size %d length %d\n", 
+			sid, wid, input_sentence[sid][wid].size, word_length_rec[sid][wid] ); 
+#endif
 
 	free(candidate_index);
 	candidate_index = NULL;
-	
+
 	return 0;
 
-    //for(i=0;i<total_words_num;i++) free(word_candidate[i]);
-    //free(word_candidate);
+	//for(i=0;i<total_words_num;i++) free(word_candidate[i]);
+	//free(word_candidate);
 }
 
 void sentence_confab(int sid)
 {
-    int i, unknown_words; 
-   std::vector<std::vector<float> > excitationLvl;
-    unknown_words = 0; 
-    for(i = 0; i < DEFAULT_SENTENCE_LENGTH; i++) { 
-        if(input_sentence[sid][i].size > 1) unknown_words ++; 
-    } 
-    #ifdef DEBUG_ALL 
-    printf("#%d: recall sentence with %d unknown words out of %d\n", sid, unknown_words, sentence_length_rec[sid]); 
-    printf("recall_sentence....\n"); 
-    #endif 
-    
-    sentence_main(sid,excitationLvl);  
-    #ifdef DEBUG_ALL 
-    fprintf(out_fp, "*********************\n"); 
-    #endif 
-    fflush(out_fp); 
+	int i, unknown_words; 
+	std::vector<std::vector<float> > excitationLvl;
+	unknown_words = 0; 
+	for(i = 0; i < DEFAULT_SENTENCE_LENGTH; i++) { 
+		if(input_sentence[sid][i].size > 1) unknown_words ++; 
+	} 
+#ifdef DEBUG_ALL 
+	printf("#%d: recall sentence with %d unknown words out of %d\n", sid, unknown_words, sentence_length_rec[sid]); 
+	printf("recall_sentence....\n"); 
+#endif 
+
+	sentence_main(sid,excitationLvl);  
+#ifdef DEBUG_ALL 
+	fprintf(out_fp, "*********************\n"); 
+#endif 
+	fflush(out_fp); 
 }
 
 bool sentence_confab_v1(int sid)
 {
-    int i,unknown_words;
+	int i,unknown_words;
 	bool flag=true;
-    std::vector<std::vector<float> > excitationLvl;
-    unknown_words = 0; 
-    for(i = 0; i < DEFAULT_SENTENCE_LENGTH; i++) { 
-        if(input_sentence[sid][i].size > 1) unknown_words ++; 
-    } 
-    #ifdef DEBUG_ALL 
-    printf("#%d: recall sentence with %d unknown words out of %d\n", sid, unknown_words, sentence_length_rec[sid]); 
-    printf("recall_sentence....\n"); 
-    #endif 
-    
-    sentence_main(sid,excitationLvl);  
+	std::vector<std::vector<float> > excitationLvl;
+	unknown_words = 0; 
+	for(i = 0; i < DEFAULT_SENTENCE_LENGTH; i++) { 
+		if(input_sentence[sid][i].size > 1) unknown_words ++; 
+	} 
+#ifdef DEBUG_ALL 
+	printf("#%d: recall sentence with %d unknown words out of %d\n", sid, unknown_words, sentence_length_rec[sid]); 
+	printf("recall_sentence....\n"); 
+#endif 
+
+	sentence_main(sid,excitationLvl);  
 	//Test
 	int word,word_candidate;
 	float max,max_1, confidence;
@@ -901,31 +900,31 @@ bool sentence_confab_v1(int sid)
 			}
 		}
 	}
-    #ifdef DEBUG_ALL 
-    fprintf(out_fp, "*********************\n"); 
-    #endif 
-    fflush(out_fp);
+#ifdef DEBUG_ALL 
+	fprintf(out_fp, "*********************\n"); 
+#endif 
+	fflush(out_fp);
 	return flag;	
 }
 
 bool sentence_confab_v2(int sid, int &word_number)
 {
-    int i,unknown_words;
+	int i,unknown_words;
 	bool flag=true;
-    std::vector<std::vector<float> > excitationLvl;
-    float max[20], max_1[20];
+	std::vector<std::vector<float> > excitationLvl;
+	float max[20], max_1[20];
 	float confidence[20];
-	
+
 	unknown_words = 0; 
-    for(i = 0; i < DEFAULT_SENTENCE_LENGTH; i++) { 
-        if(input_sentence[sid][i].size > 1) unknown_words ++; 
-    } 
-    #ifdef DEBUG_ALL 
-    printf("#%d: recall sentence with %d unknown words out of %d\n", sid, unknown_words, sentence_length_rec[sid]); 
-    printf("recall_sentence....\n"); 
-    #endif 
-    
-    sentence_main(sid,excitationLvl);  
+	for(i = 0; i < DEFAULT_SENTENCE_LENGTH; i++) { 
+		if(input_sentence[sid][i].size > 1) unknown_words ++; 
+	} 
+#ifdef DEBUG_ALL 
+	printf("#%d: recall sentence with %d unknown words out of %d\n", sid, unknown_words, sentence_length_rec[sid]); 
+	printf("recall_sentence....\n"); 
+#endif 
+
+	sentence_main(sid,excitationLvl);  
 	//Test
 	std::cout<<"Result of Sentence Confab: "<<recall_sentence<<std::endl;
 	int word,word_candidate;
@@ -951,7 +950,7 @@ bool sentence_confab_v2(int sid, int &word_number)
 		{
 			/*if(max[word]-max_1[word]>max[word]*0.10)
 				confidence[word]=1;
-			else
+				else
 				confidence[word]=0;*/
 			confidence[word] = fmin(1,(max[word]-max_1[word])/max_1[word]);
 		}
@@ -963,7 +962,7 @@ bool sentence_confab_v2(int sid, int &word_number)
 	{
 		if(max[word]>=max[word_number])
 			word_number=word;
-		
+
 		if(word==0)
 		{
 			if((confidence[word]<=CONFIDENCE_V2)&&(confidence[word+1]<=CONFIDENCE_V2))
@@ -982,9 +981,9 @@ bool sentence_confab_v2(int sid, int &word_number)
 			}
 		}
 	}
-    #ifdef DEBUG_ALL 
-    fprintf(out_fp, "*********************\n"); 
-    #endif 
-    fflush(out_fp);
+#ifdef DEBUG_ALL 
+	fprintf(out_fp, "*********************\n"); 
+#endif 
+	fflush(out_fp);
 	return true;	
 }

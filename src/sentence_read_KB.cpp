@@ -8,12 +8,10 @@ extern char recall_sentence[DEFAULT_SENTENCE_LENGTH][DEFAULT_WORD_LENGTH];
 extern int num_KB;
 extern int global_dictionary_size;
 
-
 extern struct kb_row_entry *sentence_KB_row[MAX_KB_NUM_SENTENCE]; //each entry is a nonempty row in KB
 
 extern int source_target_array_sentence[MAX_LEX_SENTENCE][MAX_LEX_SENTENCE];
 extern char** dictionary;
-
 
 extern struct hash_entry hash_table[LONG_HASH_SIZE];
 
@@ -25,20 +23,19 @@ void read_dictionary_sentence(void);
 void read_lex_sentence(void);
 void read_kb_sentence(void);
 
-FILE *KB_fp_sentence;
+FILE * KB_fp_sentence;
 int kb_source_size[MAX_KB_NUM_SENTENCE];
 
 void initialize_sentence(void)
 {
-	int i, i1;
 
-	for(i = 0; i < MAX_LEX_SENTENCE; i++) {
-		for(i1=0; i1 < MAX_LEX_SENTENCE; i1++) {
-			source_target_array_sentence[i][i1] = -1;
+	for(int i = 0; i < MAX_LEX_SENTENCE; i++) {
+		for(int j = 0; j < MAX_LEX_SENTENCE; j++) {
+			source_target_array_sentence[i][j] = -1;
 		}
 	}
 
-	for(i = 0; i < LONG_HASH_SIZE; i++) {
+	for(int i = 0; i < LONG_HASH_SIZE; i++) {
 		hash_table[i].sym_id = 0;
 		hash_table[i].next_ptr = NULL;	
 	}
@@ -55,6 +52,7 @@ void read_KB_sentence(void)
 	printf("reading KB....\n");
 
 	KB_fp_sentence = fopen(KB_file_sentence, "r");
+	
 	if(KB_fp_sentence == NULL) {
 		printf("ERROR: cannot open %s for read\n", KB_file_sentence);
 		exit(0);
@@ -105,6 +103,7 @@ int add_hash(char *s, int loc, int flag)
 	(hash_table[row].sym_id)++;
 	return 0;
 }
+
 #define mix(a,b,c) \
 { \
 	a=a-b;  a=a-c;  a=a^(c>>13); \
@@ -117,7 +116,8 @@ int add_hash(char *s, int loc, int flag)
 	b=b-c;  b=b-a;  b=b^(a<<10); \
 	c=c-a;  c=c-b;  c=c^(b>>15); \
 }
-u4 hash( register char *k, u4 length, u4 initval, int size)
+
+u4 hash(register char *k, u4 length, u4 initval, int size)
 {
 	register u4 a,b,c;  /* the internal state */
 	u4          len;    /* how many key bytes still need mixing */
