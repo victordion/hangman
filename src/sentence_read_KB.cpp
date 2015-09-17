@@ -1,4 +1,5 @@
 #include "recall.h"
+#include <iostream>
 
 extern char KB_file_sentence[128];
 extern char input_sentence[DEFAULT_SENTENCE_LENGTH][DEFAULT_WORD_LENGTH];
@@ -203,9 +204,10 @@ void read_source_target_sentence(void)
 	char str[512];
 
 	for(i = 0; i < MAX_LEX_SENTENCE; i++) {
-		for(j=0;j<MAX_LEX_SENTENCE;j++){
+		for(j = 0; j < MAX_LEX_SENTENCE; j++) {
 			fgets(str, 512, KB_fp_sentence);
 			sscanf(str, "source lex %d target lex %d kb %d\n", &s, &t, &k);
+			std::cout << s << " " << t << " "<< k << std::endl;
 			source_target_array_sentence[s][t] = k;
 		}
 	}

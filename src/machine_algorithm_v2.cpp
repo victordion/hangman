@@ -10,7 +10,7 @@
 
 char letter_frequency[26] = {'e','t','a','o','i','n','s','h','r','d','l','c','u','m','w','f','g','y','p','b','v','k','j','x','q','z'};
 int rcv_count = 0;
-char KB_file_word[128]="dump_word.txt";
+char KB_file_word[128]="./data/dump_word.txt";
 int  scratch_size = 1;
 int  num_subclusters = 1;
 int  num_display = 1;
@@ -39,7 +39,7 @@ void     expand_recall_word();
 void     free_word();
 
 //**********SENTENCE RECALL*************//
-char KB_file_sentence[128]="dump_sentence.txt";
+char KB_file_sentence[128]="./data/dump_sentence.txt";
 char out_file[128]="out_sentence.txt";
 struct input_sentence_entry input_sentence[SENTENCE_BLOCK_SIZE][DEFAULT_SENTENCE_LENGTH];
 char recall_sentence[2048];
