@@ -6,7 +6,7 @@
 
 char letter_frequency[26] = {'e','t','a','o','i','n','s','h','r','d','l','c','u','m','w','f','g','y','p','b','v','k','j','x','q','z'};
 int rcv_count = 0;
-char KB_file_word[128]="dump_word.txt";
+char KB_file_word[128]="./data/dump_word.txt";
 int  scratch_size = 1;
 int  num_subclusters = 1;
 int  num_display = 1;

@@ -62,7 +62,7 @@ void getSentence(char * secret_sentence, char * sentence)
 	FILE* pFILE;
 	srand(time(0));
 	
-	pFILE = fopen("gingerbread.txt","r");
+	pFILE = fopen("./data/gingerbread.txt","r");
 	//random_number = rand()%LINES + 1;
 	std::cout<<"Please enter the line number(1-13): ";
 	std::cin>>random_number;
