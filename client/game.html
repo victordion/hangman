@@ -1,0 +1,44 @@
+<!doctype html>
+<html ng-app = "hangmanApp">
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
+  </head>
+  <body ng-controller = "hangmanCtrl">
+    <div>
+      <h1> Current Sentence Progress</h1>
+      <p> {{currSentence}} </p>
+    </div>
+    <div>
+      <label>Character:</label>
+      <input type="text" ng-model="guessedChar" placeholder="Enter your guessed character here">
+      <button type="button" ng-click="sendGuessedChar()"> Guess </button>
+      <br>
+      <label>Sentence:</label>
+      <input type="text" ng-model="guessedSent" placeholder="Enter your guessed sentence here">
+      <button type="button" ng-click="sendGuessedSent()"> Guess </button>
+      <br>
+      <p> {{CommInfo}} </p>
+    </div>
+    </div>
+
+    <script>
+      var app = angular.module('hangmanApp', []);
+      app.controller('hangmanCtrl', ['$scope', function ($scope) {
+          $scope.CommInfo = "You entered " + ($scope.guessedChar || ' ');
+          $scope.currSentence = "Inital sentence";
+
+          $scope.sendGuessedChar = function() {
+            $scope.CommInfo = "You entered " + $scope.guessedChar;
+            $scope.currSentence += $scope.guessedChar;
+          };
+
+          $scope.sendGuessedSent = function() {
+            $scope.CommInfo = "You entered " + $scope.guessedSent;
+            $scope.currSentence += $scope.guessedSent;
+          };
+
+      }]);
+    </script>
+
+  </body>
+</html>
