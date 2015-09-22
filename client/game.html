@@ -9,6 +9,11 @@
       <p> {{currSentence}} </p>
     </div>
     <div>
+      <button type="button" ng-click="requestSentence()"> Start a Game </button>
+      <br>
+      <button type="button" ng-click="requestAIGuess()"> Let AI Guess </button>
+      <br>
+      	 
       <label>Character:</label>
       <input type="text" ng-model="guessedChar" placeholder="Enter your guessed character here">
       <button type="button" ng-click="sendGuessedChar()"> Guess </button>
@@ -22,23 +27,52 @@
     </div>
 
     <script>
+      var masked_sentence;
+      var true_sentence;
+      var wrong_chars = [];
+      var wrong_sents = [];
+      var hostAddress = 'http://127.0.0.1:11000';
       var app = angular.module('hangmanApp', []);
-      app.controller('hangmanCtrl', ['$scope', function ($scope) {
-          $scope.CommInfo = "You entered " + ($scope.guessedChar || ' ');
-          $scope.currSentence = "Inital sentence";
 
-          $scope.sendGuessedChar = function() {
-            $scope.CommInfo = "You entered " + $scope.guessedChar;
-            $scope.currSentence += $scope.guessedChar;
-          };
+      app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
+          
+	$scope.requestSentence = function() {
+          var req = {
+            method: 'POST',
+            url: hostAddress,
+            headers: {
+              'Content-Type': undefined
+            },
+            data:{'request_type':'request_sentence'}
+          }
+          $http(req).then(function(response){alert(response.data)});
+        };
+        
+	$scope.requestAIGuess = function() {
+          var req = {
+            method: 'POST',
+            url: 'http://127.0.0.1:11000',
+            headers: {
+              'Content-Type': undefined
+            },
+            data: {
+	      'request_type' : 'request_ai_guess',
+              'masked_sentence' : masked_sentence,
+              'wrong_chars' : wrong_chars,
+              'wrong_sents' : wrong_sents,	
+            }
+          }
+          $http(req).then(function(response){});
+        };
 
-          $scope.sendGuessedSent = function() {
-            $scope.CommInfo = "You entered " + $scope.guessedSent;
-            $scope.currSentence += $scope.guessedSent;
-          };
+        $scope.sendGuessedChar = function() {
+	   
+        };
+          
+        $scope.sendGuessedSent = function() {
 
+	};	
       }]);
     </script>
-
   </body>
 </html>

@@ -60,12 +60,12 @@ void getSentence(char * secret_sentence, char * sentence)
 	std::cin>>random_number;
 	for(int i=0;i<random_number;i++)
 		fgets(secret_sentence,MAX_LENGTH,pFILE);
-		
+
 	for(int i=0;i<MAX_LENGTH;i++)
 	{
 		//To convert all alphabets to lowercase
 		secret_sentence[i] = static_cast<char>(tolower(secret_sentence[i]));
-		
+
 		//fgets also inputs endline
 		if(secret_sentence[i]=='\n')
 		{
@@ -115,23 +115,23 @@ int main(void)
 	std::vector <char> list_guess, list_wrong_guess;	
 	char guess,complete;
 	bool wrong_guess = 0;
-	
+
 	getSentence(secret_sentence,sentence);
 	//std::cout << secret_sentence<<std::endl;
-	
+
 	while(1)
 	{
 		std::cout << "=========================\n";
 		if(PLAYER==PLAYER1)
-    {
+		{
 			std::cout << "Player 1's turn \n";
-      std::cout << "Player 1's score: " << PLAYER1_score << std::endl;
-    }
+			std::cout << "Player 1's score: " << PLAYER1_score << std::endl;
+		}
 		else
-    {
+		{
 			std::cout << "Player 2's turn \n";
-      std::cout << "Player 2's score: " << PLAYER2_score << std::endl;
-    }	
+			std::cout << "Player 2's score: " << PLAYER2_score << std::endl;
+		}	
 		std::cout << sentence << "\n";		
 		std::cout<<"Do you want to guess the complete sentence: (Y/N)";
 		std::cin>>complete;
@@ -140,8 +140,8 @@ int main(void)
 			std::cout<<"Guess the complete sentence: ";
 			std::getline(std::cin,complete_guess);
 			std::getline(std::cin,complete_guess);	
-			
-      //To get unknown chars left in string
+
+			//To get unknown chars left in string
 			unknown_chars=0;
 			for(int i=0;i<MAX_LENGTH;i++)
 			{
@@ -150,62 +150,62 @@ int main(void)
 				else if(sentence[i]=='?')
 					unknown_chars++;
 			}
-      
+
 			if(guessSentence(secret_sentence,complete_guess))
 			{
-          if(PLAYER==PLAYER1)
-						PLAYER1_score=PLAYER1_score+2*unknown_chars;
-					else
-						PLAYER2_score=PLAYER2_score+2*unknown_chars;
-					
-					std::cout << "Sentence: " << secret_sentence;
-          endGame(PLAYER1_score,PLAYER2_score);
-					return 0;
-      }
-      else
-      {
-          std::cout << "Sorry, that is not the right answer \n";
-					if(PLAYER==PLAYER1)
-					{
-						PLAYER1_score=PLAYER1_score-unknown_chars;
-            std::cout << "Player 1's score: " << PLAYER1_score << std::endl;                                                
-						PLAYER=PLAYER2;
-					}
-					else
-					{
-						PLAYER2_score=PLAYER2_score+unknown_chars;
-            std::cout << "Player 2's score: " << PLAYER2_score << std::endl;                                                   
-						PLAYER=PLAYER1;
-					}
-					wrong_guess=1;
-      }
+				if(PLAYER==PLAYER1)
+					PLAYER1_score=PLAYER1_score+2*unknown_chars;
+				else
+					PLAYER2_score=PLAYER2_score+2*unknown_chars;
+
+				std::cout << "Sentence: " << secret_sentence;
+				endGame(PLAYER1_score,PLAYER2_score);
+				return 0;
+			}
+			else
+			{
+				std::cout << "Sorry, that is not the right answer \n";
+				if(PLAYER==PLAYER1)
+				{
+					PLAYER1_score=PLAYER1_score-unknown_chars;
+					std::cout << "Player 1's score: " << PLAYER1_score << std::endl;                                                
+					PLAYER=PLAYER2;
+				}
+				else
+				{
+					PLAYER2_score=PLAYER2_score+unknown_chars;
+					std::cout << "Player 2's score: " << PLAYER2_score << std::endl;                                                   
+					PLAYER=PLAYER1;
+				}
+				wrong_guess=1;
+			}
 		}
 		if(wrong_guess)
 		{
 			wrong_guess=0;
 			continue;
 		}
-		
+
 		std::cout<<"Guess a character:";
 		std::cin>>guess;
 		if (searchList(list_guess,guess))
 		{
-	    	std::cout << guess << " already tried \n";
-	    	continue;
+			std::cout << guess << " already tried \n";
+			continue;
 		}
 		if(guessChar(secret_sentence,sentence,guess))
 		{
 			if(PLAYER==PLAYER1)
-      {
-				PLAYER1_score++;
-        std::cout << "Player 1's score: " << PLAYER1_score << std::endl;
-			}
-      else
 			{
-      	PLAYER2_score++;
-       std::cout << "Player 2's score: " << PLAYER2_score << std::endl;
+				PLAYER1_score++;
+				std::cout << "Player 1's score: " << PLAYER1_score << std::endl;
 			}
-      for(int i=0; i<MAX_LENGTH;i++)
+			else
+			{
+				PLAYER2_score++;
+				std::cout << "Player 2's score: " << PLAYER2_score << std::endl;
+			}
+			for(int i=0; i<MAX_LENGTH;i++)
 			{
 				if(sentence[i]=='\0')
 				{
@@ -221,23 +221,23 @@ int main(void)
 		else
 		{
 			list_wrong_guess.push_back(guess);
-			
+
 			if(PLAYER==PLAYER1)
 			{
 				PLAYER1_score--;
-        std::cout << "Player 1's score: " << PLAYER1_score << std::endl;
+				std::cout << "Player 1's score: " << PLAYER1_score << std::endl;
 				PLAYER=PLAYER2;
 			}
 			else
 			{
 				PLAYER2_score--;
-        std::cout << "Player 2's score: " << PLAYER2_score << std::endl;
+				std::cout << "Player 2's score: " << PLAYER2_score << std::endl;
 				PLAYER=PLAYER1;
 			}
 		}
-		
+
 		list_guess.push_back(guess);
-		
+
 		std::cout << "Wrong Guesses: ";
 		for(int i=0;i<list_wrong_guess.size();i++) 
 			std::cout << list_wrong_guess.at(i) <<",";

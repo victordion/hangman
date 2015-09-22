@@ -2,7 +2,7 @@ CC=g++
 
 CFLAGS=-g -O3 -std=c++11 -I$(IDIR)
 
-LDFLAGS=-lleveldb 
+LDFLAGS= 
 
 SRCDIR=./test
 BINDIR=./bin
