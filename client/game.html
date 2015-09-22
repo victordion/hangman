@@ -5,8 +5,10 @@
   </head>
   <body ng-controller = "hangmanCtrl">
     <div>
-      <h1> Current Sentence Progress</h1>
-      <p> {{currSentence}} </p>
+      <h1> Current Masked Sentence</h1>
+      <p> {{masked_sentence}} </p>
+      <h1> True Sentence</h1>
+      <p> {{true_sentence}} </p>
     </div>
     <div>
       <button type="button" ng-click="requestSentence()"> Start a Game </button>
@@ -22,20 +24,26 @@
       <input type="text" ng-model="guessedSent" placeholder="Enter your guessed sentence here">
       <button type="button" ng-click="sendGuessedSent()"> Guess </button>
       <br>
-      <p> {{CommInfo}} </p>
+      <p> {{feedback}} </p>
     </div>
     </div>
 
     <script>
-      var masked_sentence;
-      var true_sentence;
+
+      function setCharAt(str,index,chr) {
+        if(index > str.length-1) return str;
+        return str.substr(0,index) + chr + str.substr(index+1);
+      }
+      var masked_sentence = '';
+      var true_sentence = '';
       var wrong_chars = [];
       var wrong_sents = [];
       var hostAddress = 'http://127.0.0.1:11000';
       var app = angular.module('hangmanApp', []);
 
       app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
-          
+        $scope.masked_sentence = '';      
+        $scope.true_sentence = '';      
 	$scope.requestSentence = function() {
           var req = {
             method: 'POST',
@@ -45,7 +53,18 @@
             },
             data:{'request_type':'request_sentence'}
           }
-          $http(req).then(function(response){alert(response.data)});
+          /*
+          $http(req).then(function(response){
+            var json = response.data;
+            var obj = JSON.parse(json);
+            masked_sentence = obj['masked_sentence'];
+            true_sentence = obj['true_sentence'];
+          });
+          */
+          true_sentence =  'i am a good man';
+          masked_sentence ='? ?? ? ???? ???'; 
+          $scope.masked_sentence = masked_sentence;
+          $scope.true_sentence = true_sentence;
         };
         
 	$scope.requestAIGuess = function() {
@@ -66,7 +85,30 @@
         };
 
         $scope.sendGuessedChar = function() {
-	   
+	  var guess = $scope.guessedChar;
+          // A repetitive character guess
+          if(wrong_chars.indexOf(guess) > - 1) {
+            $scope.feedback = 'You guessed '.concat(guess, ', which is already guessed');
+
+	  }
+          // A new character guess
+          else {
+             var hit = false;
+             for(var i = 0; i < true_sentence.length; i++) {
+               if(true_sentence[i] == guess) {
+                 masked_sentence = setCharAt(masked_sentence, i, guess);
+                 hit = true;
+               }
+             }
+             if(hit) {
+               $scope.feedback = 'You guessed '.concat(guess, ', which is a hit. Congratulations!');
+               $scope.masked_sentence = masked_sentence;
+             }
+             else {
+               $scope.feedback = 'You guessed '.concat(guess, ', which is wrong.');
+             }
+             console.log($scope.masked_sentence);
+          }
         };
           
         $scope.sendGuessedSent = function() {
