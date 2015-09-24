@@ -50,18 +50,19 @@
             headers: {'Content-Type': undefined },
             data:{'request_type':'request_sentence'}
           }
-          /*
+          
           $http(req).then(function(response){
             var json = response.data;
             var obj = JSON.parse(json);
             masked_sentence = obj['masked_sentence'];
             true_sentence = obj['true_sentence'];
           });
-          */
+          /*
           true_sentence =  'i am a good man';
           masked_sentence ='? ?? ? ???? ???'; 
           $scope.masked_sentence = masked_sentence;
           $scope.true_sentence = true_sentence;
+          */
         };
         
 	     $scope.requestAIGuess = function() {
