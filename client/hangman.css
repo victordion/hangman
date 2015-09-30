@@ -1,0 +1,36 @@
+body {
+  background-color: #d0e4fe;
+}
+
+.status {
+  background-color: lightgrey;
+  width: 800px;
+  padding: 25px;
+  border: 5px solid navy;
+  margin: auto;
+  text-align: center;
+}
+
+.feedback {
+  background-color: lightgrey;
+  width: 800px;
+  padding: 5px;
+  border: 5px solid navy;
+  margin: auto;
+  text-align: center;
+}
+
+.control {
+  margin: auto;
+  width: 60%;
+  padding: 10px;
+  text-align: center;
+}
+
+.button {
+  margin: 0 auto;
+}
+
+p {
+  margin: 0 auto;
+}

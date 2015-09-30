@@ -2,27 +2,32 @@
 <html ng-app = "hangmanApp">
   <head>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.6/angular.min.js"></script>
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="hangman.css">
   </head>
   <body ng-controller = "hangmanCtrl">
-    <div>
+    <div class = status>
       <h1> Current Masked Sentence</h1>
       <p> {{masked_sentence}} </p>
       <h1> True Sentence</h1>
       <p> {{true_sentence}} </p>
     </div>
-    <div>
+    <div class = "control">
       <button type="button" ng-click="requestSentence()"> Start a Game </button>
-      <br>
-      <input type="text" ng-model="guessed_content" placeholder="Enter your guessed character here">
-      <button type="button" ng-click="checkGuessedContent()"> Guess </button>
-      <br>
       <button type="button" ng-click="requestAIGuess()"> Let AI Guess </button>
       <br>
+      <br>
+      <input type="text" ng-model="guessed_content" placeholder="Enter your guessed character here">
+      <br>
+      <button type="button" ng-click="checkGuessedContent()"> Guess </button>
+      <br>
+    </div>
+    <div class = "feedback">
       <h1> Feedback </h1>
       <p> {{feedback}} </p>
       <h1> Already Guessed </h1>
       <p> {{wrong_guesses}} </p>
-    </div>
     </div>
 
     <script>
@@ -50,19 +55,20 @@
             headers: {'Content-Type': undefined },
             data:{'request_type':'request_sentence'}
           }
-          
+         /* 
           $http(req).then(function(response){
             var json = response.data;
             var obj = JSON.parse(json);
             masked_sentence = obj['masked_sentence'];
             true_sentence = obj['true_sentence'];
           });
-          /*
+          */
+          
           true_sentence =  'i am a good man';
           masked_sentence ='? ?? ? ???? ???'; 
           $scope.masked_sentence = masked_sentence;
           $scope.true_sentence = true_sentence;
-          */
+          
         };
         
 	     $scope.requestAIGuess = function() {
