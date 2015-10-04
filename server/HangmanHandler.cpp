@@ -54,8 +54,9 @@ namespace HangmanService {
   void HangmanHandler::onEOM() noexcept {
 
     folly::fbstring str;
-    std::string response_str;
-    
+    std::vector<folly::fbstring>  wrong_guesses;
+    folly::fbstring masked_sentence;
+
     if(body_) {
       str = body_->moveToFbString();
       std::cout << "Str is " << str << std::endl;
@@ -64,22 +65,29 @@ namespace HangmanService {
       std::cout << "Request type is" << parsed["request_type"] << std::endl;
       
       if(parsed["request_type"] == "request_guess") {
-        std::string masked_sentence = parsed["masked_sentence"];
-        std::vector<std::string>  wrong_guesses= parsed["wrong_guesses"];
+        //masked_sentence = parsed["masked_sentence"].asString();
+        for(size_t i = 0; i < parsed["wrong_guesses"].size(); i++) {
+          //wrong_guesses.push_back(parsed["wrong_guesses"][i].asString());
+        }
       }
-	
     }
+
+    folly::fbstring response_str = guesser_.guess(masked_sentence, wrong_guesses);
+    folly::dynamic d = dynamic::object("guess_result", response_str);
+    folly::fbstring response_json = folly::toJson(d);
+
 
     ResponseBuilder(downstream_)
       .status(200, "OK")
       .header("Request-Number", folly::to<std::string>(stats_->getRequestCount()))
       .header("Access-Control-Allow-Origin", "*")
       //.body(std::move(body_))
-      .body("HiHiHi")
+      .body(response_json)
       .sendWithEOM();
-    std::cout << "Response Sent: " << str << std::endl;
 
-    //std::cout << str << std::endl;	
+    // For debug use
+    std::cout << "Response Sent: " << response_json << std::endl;
+
   }
 
   void HangmanHandler::onUpgrade(UpgradeProtocol protocol) noexcept {

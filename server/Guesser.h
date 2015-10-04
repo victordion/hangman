@@ -3,15 +3,16 @@
 #include <vector>
 #include <string>
 #include <unordered_set>
+#include <folly/FBString.h>
 
 class Guesser {
 public:
-  std::string guess(std::string masked_sentence, std::vector<std::string> wrong_guesses) {
+  folly::fbstring guess(folly::fbstring masked_sentence, std::vector<folly::fbstring> wrong_guesses) {
     std::unordered_set<char> wrong_chars;
-    std::unordered_set<std::string> wrong_sentences;
+    std::unordered_set<folly::fbstring> wrong_sentences;
     std::unordered_set<char> guessed_chars;
 
-    for(std::string & str : wrong_guesses) {
+    for(folly::fbstring & str : wrong_guesses) {
       if(str.length() == 1) {
         wrong_chars.insert(str[0]);
       }
@@ -35,10 +36,10 @@ public:
         return "";
       }
     }
-    return std::string(1, c); 
+    return folly::fbstring(1, c); 
 
   }
-}
+};
 
 
 #endif

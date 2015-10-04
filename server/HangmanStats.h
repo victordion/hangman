@@ -30,12 +30,12 @@ class HangmanStats {
     ++reqCount_;
   }
 
-  virtual uint64_t getRequestCount() {
+  virtual long long  getRequestCount() {
     return reqCount_;
   }
 
  private:
-  uint64_t reqCount_{0;
-};
+  long long reqCount_{0};
+ };
 
 }
