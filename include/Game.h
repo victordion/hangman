@@ -1,6 +1,9 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 #include "Player.h"
+#include <vector>
+#include <iostream>
+#include <fstream>
 
 class Game {
 	public:
@@ -29,7 +32,7 @@ class Game {
 
 			getline(input, m_true_sentence);
 
-      for (int i = 0; i < m_true_sentence.length(); ++i) {
+      for (size_t i = 0; i < m_true_sentence.length(); ++i) {
         if (m_true_sentence[i] >= 'A' && m_true_sentence[i] <= 'Z') {
           m_true_sentence[i] -= 'A' - 'a';
         } 
@@ -39,7 +42,7 @@ class Game {
 
       m_masked_sentence.resize(m_true_sentence.length());
 
-      for (int i = 0; i < m_true_sentence.length(); ++i) {
+      for (size_t i = 0; i < m_true_sentence.length(); ++i) {
         if (m_true_sentence[i] == ' ') {
           m_masked_sentence[i] = ' ';
         }
@@ -69,7 +72,7 @@ class Game {
 		void checkAnswer(std::string guess) {
 			// Case: player guessed a char
 			if (guess.length() == 1) {
-				for (int i = 0; i < m_true_sentence.length(); ++i) {
+				for (size_t i = 0; i < m_true_sentence.length(); ++i) {
 					if (m_true_sentence[i] == guess[0]) {
 						m_masked_sentence[i] = m_true_sentence[i];
 					}
@@ -90,9 +93,8 @@ class Game {
 
 	protected:
     
-    int m_curr_round;
-
 		int m_num_players;
+    int m_curr_round;
 		int m_curr_turn;  // which player's turn
 		std::vector<Player> m_players;
 		std::vector<int> m_scores;
