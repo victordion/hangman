@@ -14,6 +14,7 @@
 #include <folly/Memory.h>
 #include <proxygen/httpserver/RequestHandler.h>
 #include "Guesser.h"
+#include "GameCreator.h"
 
 namespace proxygen {
   class ResponseHandler;
@@ -42,6 +43,7 @@ namespace HangmanService {
     private:
       HangmanStats* const stats_{nullptr};
       Guesser guesser_;
+      GameCreator game_creator_;
       std::unique_ptr<folly::IOBuf> body_;
   };
 

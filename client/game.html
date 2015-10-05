@@ -10,8 +10,8 @@
     <div class = status>
       <h1> Current Masked Sentence</h1>
       <p> {{masked_sentence}} </p>
-      <h1> True Sentence</h1>
-      <p> {{true_sentence}} </p>
+      <h1 class = debug> True Sentence</h1>
+      <p class = debug> {{true_sentence}} </p>
     </div>
     <div class = "control">
       <button type="button" ng-click="requestSentence()"> Start a Game </button>
@@ -24,112 +24,13 @@
       <br>
     </div>
     <div class = "feedback">
-      <h1> Feedback </h1>
-      <p> {{feedback}} </p>
+      <h1> Human Feedback </h1>
+      <p> {{human_feedback}} </p>
+      <h1> Computer Feedback </h1>
+      <p> {{computer_feedback}} </p>
       <h1> Already Guessed </h1>
       <p> {{wrong_guesses}} </p>
     </div>
-
-    <script>
-
-      function setCharAt(str,index,chr) {
-        if(index > str.length-1) return str;
-        return str.substr(0,index) + chr + str.substr(index+1);
-      }
-      var masked_sentence = '';
-      var true_sentence = '';
-      var wrong_guesses = [];
-      var hostAddress = 'http://127.0.0.1:11000';
-      var app = angular.module('hangmanApp', []);
-      
-      app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
-        
-        $scope.masked_sentence = '';      
-        $scope.true_sentence = '';      
-      	$scope.wrong_guesses = [];
-
-        $scope.requestSentence = function() {
-          var req = {
-            method: 'POST',
-            url: hostAddress,
-            headers: {'Content-Type': undefined },
-            data:{'request_type':'request_sentence'}
-          }
-         /* 
-          $http(req).then(function(response){
-            var json = response.data;
-            var obj = JSON.parse(json);
-            masked_sentence = obj['masked_sentence'];
-            true_sentence = obj['true_sentence'];
-          });
-          */
-          
-          true_sentence =  'i am a good man';
-          masked_sentence ='? ?? ? ???? ???'; 
-          $scope.masked_sentence = masked_sentence;
-          $scope.true_sentence = true_sentence;
-          
-        };
-        
-	     $scope.requestAIGuess = function() {
-          var req = {
-            method: 'POST',
-            url: 'http://127.0.0.1:11000',
-            headers: {
-              'Content-Type': undefined
-            },
-            data: {
-	            'request_type' : 'request_ai_guess',
-              'masked_sentence' : masked_sentence,
-              'wrong_chars' : wrong_chars,
-              'wrong_sents' : wrong_sents,	
-            }
-          }
-          $http(req).then(function(response){});
-        };
-
-        $scope.checkGuessedContent = function() {
-          // If the user if guessing a whole sentence.
-          if($scope.guessed_content.length > 1) {
-            if($scope.guessed_content == true_sentence) {
-              $scope.feedback = 'Congratulations! You win!';
-            }
-            else {
-              $scope.feedback = "Incorrect sentence guess";
-              if(wrong_guesses.indexOf($scope.guessed_content) == -1) {
-                wrong_guesses.push($scope.guessed_content);
-              }
-            }
-          }
-          // A repetitive character guess
-          else if(wrong_guesses.indexOf($scope.guessed_content) > - 1) {
-            $scope.feedback = 'You guessed '.concat($scope.guessed_content, ', which is already guessed');
-	        }
-          // A new character guess
-          else {
-             wrong_guesses.push($scope.guessed_content);
-             var hit = false;
-             for(var i = 0; i < true_sentence.length; i++) {
-               if(true_sentence[i] == $scope.guessed_content) {
-                 masked_sentence = setCharAt(masked_sentence, i, $scope.guessed_content);
-                 hit = true;
-               }
-             }
-             if(hit) {
-               $scope.feedback = 'You guessed '.concat($scope.guessed_content, ', which is a hit. Congratulations!');
-               $scope.masked_sentence = masked_sentence;
-             }
-             else {
-               $scope.feedback = 'You guessed '.concat($scope.guessed_content, ', which is wrong.');
-             }
-          }
-          $scope.wrong_guesses = wrong_guesses;
-          if(masked_sentence ==  true_sentence) {
-            $scope.feedback = 'Congratulations! You win!';
-          }
-        };
-          
-      }]);
-    </script>
-  </body>
+    <script src = 'game.js'>p</script>
+ </body>
 </html>

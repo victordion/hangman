@@ -53,29 +53,43 @@ namespace HangmanService {
 
   void HangmanHandler::onEOM() noexcept {
 
-    folly::fbstring str;
+    folly::fbstring received_str;
     std::vector<folly::fbstring>  wrong_guesses;
     folly::fbstring masked_sentence;
+    folly::fbstring response_json;
 
     if(body_) {
-      str = body_->moveToFbString();
-      std::cout << "Str is " << str << std::endl;
+      received_str = body_->moveToFbString();
+      std::cout << "Received string is " << received_str << std::endl;
 
-      dynamic parsed = folly::parseJson(str);   
+      dynamic parsed = folly::parseJson(received_str);   
       std::cout << "Request type is" << parsed["request_type"] << std::endl;
-      
+      /*
+       * If the HTTP request is asking for guess
+       */
       if(parsed["request_type"] == "request_guess") {
-        //masked_sentence = parsed["masked_sentence"].asString();
+        masked_sentence = parsed["masked_sentence"].getString();
         for(size_t i = 0; i < parsed["wrong_guesses"].size(); i++) {
-          //wrong_guesses.push_back(parsed["wrong_guesses"][i].asString());
+          wrong_guesses.push_back(parsed["wrong_guesses"][i].getString());
         }
+        folly::fbstring response_str = guesser_.guess(masked_sentence, wrong_guesses);
+        folly::dynamic d = dynamic::object("guess_result", response_str);
+        folly::fbstring response_json = folly::toJson(d);
+      }
+      /*
+       * If the HTTP request is asking for a new sentence, i.e. start a game
+       */
+      else if(parsed["request_type"] == "request_sentence"){
+
+        std::cout << "Received a new sentence request" << std::endl;
+
+        folly::fbstring response_str = game_creator_.genSentence();
+        folly::dynamic d = dynamic::object("new_sentence", response_str);
+        response_json = folly::toJson(d);
       }
     }
 
-    folly::fbstring response_str = guesser_.guess(masked_sentence, wrong_guesses);
-    folly::dynamic d = dynamic::object("guess_result", response_str);
-    folly::fbstring response_json = folly::toJson(d);
-
+    std::cout << "JSON response is " << response_json << std::endl;
 
     ResponseBuilder(downstream_)
       .status(200, "OK")
