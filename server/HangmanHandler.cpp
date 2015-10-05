@@ -9,12 +9,12 @@
  *  Modified on Oct 1 2015
  *  By Jianwei Cui
  */
+
+#include "HangmanStats.h"
 #include "HangmanHandler.h"
 
 #include <proxygen/httpserver/RequestHandler.h>
 #include <proxygen/httpserver/ResponseBuilder.h>
-
-#include "HangmanStats.h"
 #include <folly/dynamic.h>
 #include <folly/json.h>
 
@@ -36,14 +36,6 @@ namespace HangmanService {
 
   void HangmanHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept {
     std::cout << "Onbody functions is called." << std::endl;
-    /*
-       if(body) {
-       std::cout << "Incoming body data is " << body->moveToFbString() << std::endl;
-       }
-       else {
-       std::cout << "Incoming body is null." << std::endl;
-       }
-       */
     if (body_) {	
       body_->prependChain(std::move(body));
     } else {
@@ -73,8 +65,10 @@ namespace HangmanService {
           wrong_guesses.push_back(parsed["wrong_guesses"][i].getString());
         }
         folly::fbstring response_str = guesser_.guess(masked_sentence, wrong_guesses);
+        std::cout << "Guesser returned a value: " << response_str << std::endl;
+
         folly::dynamic d = dynamic::object("guess_result", response_str);
-        folly::fbstring response_json = folly::toJson(d);
+        response_json = folly::toJson(d);
       }
       /*
        * If the HTTP request is asking for a new sentence, i.e. start a game

@@ -95,13 +95,6 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
         }
       }
     });
-     
-   /* 
-    true_sentence =  'i am a good man';
-    masked_sentence ='? ?? ? ???? ???'; 
-    $scope.masked_sentence = masked_sentence;
-    $scope.true_sentence = true_sentence;
-   */
   };
   
   /*
@@ -116,16 +109,22 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
       },
       data: {
         'request_type' : 'request_guess',
-        'masked_sentence' : masked_sentence,
-        'wrong_guesses' : wrong_guesses,
+        'masked_sentence' : $scope.masked_sentence,
+        'wrong_guesses' : $scope.wrong_guesses,
       }
     }
+    console.log('Request sent: ' + JSON.stringify(req));
+    
     $http(req).then(function(response){
+      console.log('Server reply result: ' + response);
       var json = response.data;
-      var obj = JSON.parse(json);
-      var guessed = obj['guessed_result'];
-      
+      var guessed = json['guess_result'];
+      console.log('Server guess result: ' + guessed);
 
+      var ret = checkGuess($scope.true_sentence, $scope.masked_sentence, guessed, $scope.wrong_guesses);    
+      $scope.computer_feedback = ret.feedback;
+      $scope.masked_sentence = ret.masked_sentence;
+      $scope.wrong_guesses = ret.wrong_guesses;
     });
   };
 
