@@ -11,12 +11,29 @@ body {
   text-align: center;
 }
 
+.masked_sentence {
+  font-size: 50px;
+}
+
+
 .feedback {
+  display: -webkit-flex;
+  display: flex;
   background-color: lightgrey;
   width: 800px;
+  height: 800px;
   padding: 5px;
   border: 5px solid navy;
   margin: auto;
+  text-align: center;
+}
+
+.sub_feedback {
+  background-color: lightgrey;
+  width: 800px;
+  padding: 5px;
+  /* border: 5px solid navy; */
+  margin: 5px;
   text-align: center;
 }
 
@@ -34,7 +51,8 @@ body {
 .button {
   margin: 0 auto;
 }
-
+/*
 p {
   margin: 0 auto;
 }
+*/

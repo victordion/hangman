@@ -9,7 +9,9 @@
   <body ng-controller = "hangmanCtrl">
     <div class = status>
       <h1> Current Masked Sentence</h1>
-      <p> {{masked_sentence}} </p>
+      <p class = "masked_sentence"> {{masked_sentence}} </p>
+      <h1> Already Guessed </h1>
+      <p> {{wrong_guesses}} </p>
       <h1 class = debug> True Sentence</h1>
       <p class = debug> {{true_sentence}} </p>
     </div>
@@ -18,18 +20,20 @@
       <button type="button" ng-click="requestAIGuess()"> Let AI Guess </button>
       <br>
       <br>
-      <input type="text" ng-model="guessed_content" placeholder="Enter your guessed character here">
+      <input type="text" ng-model="guessed_content" ng-keyup="$event.keyCode == 13 && checkGuess()" placeholder="Enter your guessed character here">
       <br>
-      <button type="button" ng-click="checkGuessedContent()"> Guess </button>
+      <button type="button" ng-click="checkGuess()"> Guess </button>
       <br>
     </div>
     <div class = "feedback">
-      <h1> Human Feedback </h1>
-      <p> {{human_feedback}} </p>
-      <h1> Computer Feedback </h1>
-      <p> {{computer_feedback}} </p>
-      <h1> Already Guessed </h1>
-      <p> {{wrong_guesses}} </p>
+      <div class = "sub_feedback">
+        <h1> Human Score: {{human_score}} </h1>
+        <p> {{human_feedback}} </p>
+      </div>
+      <div class = "sub_feedback">
+        <h1> Computer Score: {{computer_score}} </h1>
+        <p> {{computer_feedback}} </p>
+      </div>
     </div>
     <script src = 'game.js'>p</script>
  </body>

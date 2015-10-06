@@ -2,17 +2,29 @@ function setCharAt(str,index,chr) {
   if(index > str.length-1) return str;
   return str.substr(0,index) + chr + str.substr(index+1);
 }
-  
+/*
+ * Check the guess against true_sentence
+ */ 
 function checkGuess(true_sentence, masked_sentence, guessed_content, wrong_guesses) {
+  var score = 0;
+  var num_masked = 0;
+  var complete = false;
+
+  for(var i = 0; i < guessed_content.length; ++i) {
+    num_masked += masked_sentence[i] == '?';
+  }
+
   /*
    *  If the user if guessing a whole sentence.
    */
   if(guessed_content.length > 1) {
     if(guessed_content == true_sentence) {
-      feedback = 'Congratulations! You win!';
+      feedback = 'Congratulations! Sentence guess completed!';
+      masked_sentence = true_sentence;
+      score += num_masked;
     }
     else {
-      feedback = "Incorrect sentence guess";
+      feedback = "Incorrect sentence guess: " + guessed_content;
       if(wrong_guesses.indexOf(guessed_content) == -1) {
         wrong_guesses.push(guessed_content);
       }
@@ -38,16 +50,19 @@ function checkGuess(true_sentence, masked_sentence, guessed_content, wrong_guess
      }
      if(hit) {
        feedback = 'You guessed '.concat(guessed_content, ', which is a hit. Congratulations!');
+       score += 1;
      }
      else {
        feedback = 'You guessed '.concat(guessed_content, ', which is wrong.');
      }
   }
   if(masked_sentence ==  true_sentence) {
-    feedback = 'Congratulations! You win!';
+    complete = true;
   }
   
   return {
+    'score' : score,
+    'complete' : complete,
     'feedback': feedback,
     'masked_sentence': masked_sentence,
     'wrong_guesses': wrong_guesses
@@ -61,15 +76,27 @@ var hostAddress = 'http://127.0.0.1:11000';
 var app = angular.module('hangmanApp', []);
 
 app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
+  /*
+   * Set game state variables to their initial values
+   */
+  $scope.resetGame = function () {  
+    $scope.masked_sentence = '';      
+    $scope.true_sentence = '';      
+	  $scope.wrong_guesses = [];
+    $scope.human_score = 0;
+    $scope.computer_score = 0;
+    $scope.human_feedback = '';
+    $scope.computer_feedback = '';
+  }
   
-  $scope.masked_sentence = '';      
-  $scope.true_sentence = '';      
-	$scope.wrong_guesses = [];
+  $scope.resetGame();
 
   /*
    * Send a HTTP request ask for new sentence
    */
   $scope.requestSentence = function() {
+    $scope.resetGame();
+    
     var req = {
       method: 'POST',
       url: hostAddress,
@@ -79,8 +106,6 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
     
     console.log('Request sent: ' + JSON.stringify(req));
     
-    $scope.masked_sentence = '';
-
     $http(req).then(function(response){
       console.log('Response Received: ' + JSON.stringify(response));
       var json = response.data;
@@ -125,19 +150,22 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
       $scope.computer_feedback = ret.feedback;
       $scope.masked_sentence = ret.masked_sentence;
       $scope.wrong_guesses = ret.wrong_guesses;
+      $scope.computer_score += ret.score;
     });
   };
 
   /*
    * Check the answer after the human user makes a guess
    */
-  $scope.checkGuessedContent = function() {
-    
-    var ret = checkGuess($scope.true_sentence, $scope.masked_sentence, $scope.guessed_content, $scope.wrong_guesses);
-    $scope.human_feedback = ret.feedback;
-    $scope.masked_sentence = ret.masked_sentence;
-    $scope.wrong_guesses = ret.wrong_guesses;
-
+  $scope.checkGuess = function() {
+    if($scope.guessed_content) { 
+      var ret = checkGuess($scope.true_sentence, $scope.masked_sentence, $scope.guessed_content, $scope.wrong_guesses);
+      $scope.human_feedback = ret.feedback;
+      $scope.masked_sentence = ret.masked_sentence;
+      $scope.wrong_guesses = ret.wrong_guesses;
+      $scope.human_score += ret.score;
+      $scope.guessed_content = '';
+    }
   };
   
 }]);
