@@ -1,0 +1,1 @@
+g++ -std=c++11  -D UNIT_TEST dbManager.cpp -o test_dbManager -lleveldb

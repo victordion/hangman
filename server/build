@@ -1,1 +1,1 @@
-g++ -std=c++11 -o my_hangman HangmanServer.cpp HangmanHandler.cpp -lproxygenhttpserver -lfolly -lglog -lgflags -pthread
+g++ -std=c++11 -o HangmanServer HangmanServer.cpp HangmanHandler.cpp -lproxygenhttpserver -lfolly -lglog -lgflags -pthread
