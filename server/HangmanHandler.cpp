@@ -55,7 +55,7 @@ namespace HangmanService {
       std::cout << "Received string is " << received_str << std::endl;
 
       dynamic parsed = folly::parseJson(received_str);   
-      std::cout << "Request type is" << parsed["request_type"] << std::endl;
+      std::cout << "Request type is " << parsed["request_type"] << std::endl;
       /*
        * If the HTTP request is asking for guess
        */
