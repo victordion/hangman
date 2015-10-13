@@ -72,13 +72,14 @@ function checkGuess(true_sentence, masked_sentence, guessed_content, wrong_guess
 var masked_sentence = '';
 var true_sentence = '';
 var wrong_guesses = [];
-var hostAddress = 'http://127.0.0.1:11000';
+var hostAddress = 'http://128.230.213.57:11000';
 var app = angular.module('hangmanApp', []);
 
 app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
   /*
    * Set game state variables to their initial values
    */
+
   $scope.resetGame = function () {  
     $scope.masked_sentence = '';      
     $scope.true_sentence = '';      
@@ -128,7 +129,7 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
   $scope.requestAIGuess = function() {
     var req = {
       method: 'POST',
-      url: 'http://127.0.0.1:11000',
+      url: hostAddress,
       headers: {
         'Content-Type': undefined
       },
