@@ -76,8 +76,8 @@ namespace HangmanService {
       else if(parsed["request_type"] == "request_sentence"){
 
         std::cout << "Received a new sentence request" << std::endl;
-
-        folly::fbstring response_str = game_creator_.genSentence();
+        folly::fbstring sentence_id = parsed["sentence_id"].getString();
+        folly::fbstring response_str = game_creator_.genSentence(sentence_id);
         folly::dynamic d = dynamic::object("new_sentence", response_str);
         response_json = folly::toJson(d);
       }

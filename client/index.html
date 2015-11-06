@@ -16,7 +16,10 @@
       <p class = debug> {{true_sentence}} </p>
     </div>
     <div class = "control">
+      Input a sentence ID <input type="text" ng-model="sentence_id" ng-init="sentence_id='0'" value="0" >
       <button type="button" ng-click="requestSentence()"> Start a Game </button>
+      <br>
+      <br>
       <button type="button" ng-click="requestAIGuess()"> Let AI Guess </button>
       <br>
       <br>

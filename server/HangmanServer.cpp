@@ -14,7 +14,7 @@
 #include <proxygen/httpserver/HTTPServer.h>
 #include <proxygen/httpserver/RequestHandlerFactory.h>
 #include <unistd.h>
-
+void initialize();
 #include "HangmanHandler.h"
 #include "HangmanStats.h"
 
@@ -64,7 +64,8 @@ int main(int argc, char* argv[]) {
     FLAGS_threads = sysconf(_SC_NPROCESSORS_ONLN);
     CHECK(FLAGS_threads > 0);
   }
-
+//Syed added
+  initialize();
   HTTPServerOptions options;
   options.threads = static_cast<size_t>(FLAGS_threads);
   options.idleTimeout = std::chrono::milliseconds(60000);

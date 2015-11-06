@@ -1,44 +1,117 @@
 #ifndef _GUESSER_H_
 #define _GUESSER_H_
+#include <iostream>
 #include <vector>
 #include <string>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 #include <unordered_set>
 #include <folly/FBString.h>
 
+extern char recall_sentence[2048];
+extern int letter_select_candidate[26];
+extern double letter_select_frequency[26];
+
+void sentence_confab(int sid);
+void letter_select(std::string str, char &letter);
+void free_input_sentence(int sid);
+int collect_wconf_results(std::string str, int word_count);
+void clear_sentence(int sid);
+
 class Guesser {
-public:
-  folly::fbstring guess(folly::fbstring masked_sentence, std::vector<folly::fbstring> wrong_guesses) {
-    std::unordered_set<char> wrong_chars;
-    std::unordered_set<folly::fbstring> wrong_sentences;
-    std::unordered_set<char> guessed_chars;
+	public:
+		Guesser()
+		{
+		}
 
-    for(folly::fbstring & str : wrong_guesses) {
-      if(str.length() == 1) {
-        wrong_chars.insert(str[0]);
-      }
-      else {
-        wrong_sentences.insert(str);
-      }
-    } 
-    
-    for(char & c : masked_sentence) {
-      if(c >= 'a' && c <= 'z') {
-        guessed_chars.insert(c);
-      }
-    }
-    
-    char c = rand() % 26 + 'a';    
-    int count = 0;
+		folly::fbstring guess(folly::fbstring masked_sentence, std::vector<folly::fbstring> wrong_guesses) {
+			std::vector<char> wrong_chars;
+			std::unordered_set<folly::fbstring> wrong_sentences;
+			//std::unordered_set<char> guessed_chars;
 
-    while(wrong_chars.find(c) != wrong_chars.end() || guessed_chars.find(c) != guessed_chars.end()) {
-      c = rand() % 26 + 'a';
-      if(count++ > 100) {
-        return "";
-      }
-    }
-    return folly::fbstring(1, c); 
+			folly::fbstring guessed_sentence = "";
+			clear_sentence(0);
 
-  }
+			for(folly::fbstring & str : wrong_guesses) {
+				if(str.length() == 1) {
+					wrong_chars.push_back(str[0]);
+				}
+				else {
+					wrong_sentences.insert(str);
+				}
+			} 
+			
+			int selected_size = wrong_chars.size();
+			int i;
+			for(i = 0; i < 26; i++)
+			{
+				letter_select_frequency[i] = 0.0;
+				letter_select_candidate[i] = 0;
+			}
+			for(i=0;i<selected_size;i++)
+			{
+				letter_select_frequency[i] = 0.0;
+				letter_select_candidate[wrong_chars[i] - 'a'] = -1;
+			}
+	
+
+			/*for(char & c : masked_sentence) {
+				if(c >= 'a' && c <= 'z') {
+					guessed_chars.insert(c);
+				}
+			}*/
+
+			// Syed Entry - 10/15/2015
+			// Splitting a sentence into words
+			std::istringstream iss(folly::toStdString(masked_sentence));
+			std::vector<std::string> words;
+			std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), std::back_inserter(words));
+
+			// Calling word confabulation for all the words and deciding whether to guess letter or word
+			bool guess_letter = false;
+			for (int i = 0; i < words.size(); i++)
+			{
+				if (collect_wconf_results(words.at(i), i) == 1)
+					guess_letter = true;
+			}
+
+			//Calls letter_select function to guess the letter and converts it to string before returning
+			if (guess_letter)
+			{
+				char guessed_letter;
+				letter_select(folly::toStdString(masked_sentence), guessed_letter);
+				//char guessed_letter = letter_select(masked_sentence);
+				free_input_sentence(0);
+				return folly::fbstring(1, guessed_letter); 
+			}
+			else 
+			{
+				//Calls sentence confabulation to get the sentence and if that sentence is already guessed, guesses a letter instead
+				//guessed_sentence = sentence_confab(0);
+				sentence_confab(0);
+				free_input_sentence(0);
+				std::cout<<"Recall sentence: "<<recall_sentence<<std::endl;
+				for(int i=0; recall_sentence[i]!= '\0'; i++)
+				{
+					guessed_sentence += recall_sentence[i];
+				}
+				guessed_sentence = guessed_sentence.substr(0, guessed_sentence.length() - 1);
+				
+				std::unordered_set<folly::fbstring>::const_iterator got = wrong_sentences.find (guessed_sentence);
+				if (got != wrong_sentences.end())
+				{
+					char guessed_letter;
+					letter_select(folly::toStdString(masked_sentence), guessed_letter);
+					//char guessed_letter = letter_select(masked_sentence);
+
+					return folly::fbstring(1, guessed_letter); 
+				}
+				
+				strcpy(recall_sentence, "\0");
+				return guessed_sentence;
+			}
+		}
 };
 
 

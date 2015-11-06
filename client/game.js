@@ -54,6 +54,7 @@ function checkGuess(true_sentence, masked_sentence, guessed_content, wrong_guess
      }
      else {
        feedback = 'You guessed '.concat(guessed_content, ', which is wrong.');
+       score -= 1;
      }
   }
   if(masked_sentence ==  true_sentence) {
@@ -88,6 +89,7 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
     $scope.computer_score = 0;
     $scope.human_feedback = '';
     $scope.computer_feedback = '';
+    //$scope.sentence_id = '0';
   }
   
   $scope.resetGame();
@@ -102,7 +104,9 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
       method: 'POST',
       url: hostAddress,
       headers: {'Content-Type': undefined },
-      data:{'request_type':'request_sentence'}
+      data:{'request_type':'request_sentence',
+            'sentence_id': $scope.sentence_id }
+     
     }
     
     console.log('Request sent: ' + JSON.stringify(req));
