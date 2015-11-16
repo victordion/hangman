@@ -75,13 +75,29 @@ var true_sentence = '';
 var wrong_guesses = [];
 var hostAddress = 'http://128.230.213.57:11000';
 var app = angular.module('hangmanApp', []);
+var State = {IDLE : "IDLE", IN_PROCESS: "IN_PROCESS"};
+var curr_state;
 
 app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
+  
+  /*
+   * Set button to be disabled/not-disabled
+   */
+  var update_button_disable_features = function() {
+    $scope.request_guess_button_disabled = (curr_state == State.IDLE); 
+    $scope.check_guess_button_disabled = (curr_state == State.IDLE);
+    console.log("request_guess_button_disabled: " + $scope.request_guess_button_disabled);
+    console.log("check_guess_button_disabled: " + $scope.check_guess_button_disabled);   
+  }
+
   /*
    * Set game state variables to their initial values
    */
-
-  $scope.resetGame = function () {  
+  var init = function() {
+    console.log("init() called");
+    curr_state = State.IDLE;
+    update_button_disable_features(); 
+  
     $scope.masked_sentence = '';      
     $scope.true_sentence = '';      
 	  $scope.wrong_guesses = [];
@@ -89,17 +105,16 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
     $scope.computer_score = 0;
     $scope.human_feedback = '';
     $scope.computer_feedback = '';
-    //$scope.sentence_id = '0';
   }
-  
-  $scope.resetGame();
+ 
+  init();
+ 
 
   /*
-   * Send a HTTP request ask for new sentence
+   * Send a HTTP request ask for new sentence (start a new game)
    */
   $scope.requestSentence = function() {
-    $scope.resetGame();
-    
+    init(); 
     var req = {
       method: 'POST',
       url: hostAddress,
@@ -124,6 +139,8 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
           $scope.masked_sentence += ' ';
         }
       }
+      curr_state = State.IN_PROCESS;
+      update_button_disable_features();
     });
   };
   
@@ -156,6 +173,10 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
       $scope.masked_sentence = ret.masked_sentence;
       $scope.wrong_guesses = ret.wrong_guesses;
       $scope.computer_score += ret.score;
+      if(ret.complete) {
+          curr_state = State.IDLE;
+          update_button_disable_features();    
+      }
     });
   };
 
@@ -170,6 +191,10 @@ app.controller('hangmanCtrl', ['$scope', '$http', function($scope, $http) {
       $scope.wrong_guesses = ret.wrong_guesses;
       $scope.human_score += ret.score;
       $scope.guessed_content = '';
+      if(ret.complete) {
+          curr_state = State.IDLE;    
+          update_button_disable_features();
+      }
     }
   };
   

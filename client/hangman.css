@@ -9,12 +9,17 @@ body {
   border: 5px solid navy;
   margin: auto;
   text-align: center;
+  font-family: fixed, monospace;
 }
 
 .masked_sentence {
-  font-size: 50px;
+  font-size: 30px;
 }
 
+.title {
+  font-family: "Times New Roman", Times, serif;  
+  font-weight: bold;
+}
 
 .feedback {
   display: -webkit-flex;
