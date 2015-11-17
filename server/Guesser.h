@@ -8,10 +8,12 @@
 #include <iterator>
 #include <unordered_set>
 #include <folly/FBString.h>
+#include <mutex>
 
 extern char recall_sentence[2048];
 extern int letter_select_candidate[26];
 extern double letter_select_frequency[26];
+extern std::mutex mtx;
 
 void sentence_confab(int sid);
 void letter_select(std::string str, char &letter);
@@ -19,16 +21,18 @@ void free_input_sentence(int sid);
 int collect_wconf_results(std::string str, int word_count);
 void clear_sentence(int sid);
 
+namespace HangmanService {
 class Guesser {
+  private:
 	public:
-		Guesser()
-		{
+		Guesser() {
+      std::cout << "*** New Guesser created." << std::endl;
 		}
 
 		folly::fbstring guess(folly::fbstring masked_sentence, std::vector<folly::fbstring> wrong_guesses) {
+      std::lock_guard<std::mutex> lck(mtx);
 			std::vector<char> wrong_chars;
 			std::unordered_set<folly::fbstring> wrong_sentences;
-			//std::unordered_set<char> guessed_chars;
 
 			folly::fbstring guessed_sentence = "";
 			clear_sentence(0);
@@ -55,13 +59,6 @@ class Guesser {
 				letter_select_candidate[wrong_chars[i] - 'a'] = -1;
 			}
 	
-
-			/*for(char & c : masked_sentence) {
-				if(c >= 'a' && c <= 'z') {
-					guessed_chars.insert(c);
-				}
-			}*/
-
 			// Syed Entry - 10/15/2015
 			// Splitting a sentence into words
 			std::istringstream iss(folly::toStdString(masked_sentence));
@@ -76,12 +73,11 @@ class Guesser {
 					guess_letter = true;
 			}
 
-			//Calls letter_select function to guess the letter and converts it to string before returning
+			// Calls letter_select function to guess the letter and converts it to string before returning
 			if (guess_letter)
 			{
 				char guessed_letter;
 				letter_select(folly::toStdString(masked_sentence), guessed_letter);
-				//char guessed_letter = letter_select(masked_sentence);
 				free_input_sentence(0);
 				return folly::fbstring(1, guessed_letter); 
 			}
@@ -92,7 +88,7 @@ class Guesser {
 				sentence_confab(0);
 				free_input_sentence(0);
 				std::cout<<"Recall sentence: "<<recall_sentence<<std::endl;
-				for(int i=0; recall_sentence[i]!= '\0'; i++)
+				for(int i = 0; recall_sentence[i]!= '\0'; i++)
 				{
 					guessed_sentence += recall_sentence[i];
 				}
@@ -114,5 +110,8 @@ class Guesser {
 		}
 };
 
+
+
+}
 
 #endif

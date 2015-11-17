@@ -2,7 +2,9 @@
 #include <sys/time.h>
 #include <vector>
 #include <iostream>
+
 char* tag_sym[41] = {"#","$","ls",":","``","uh","fw","sym","wrb","rp","prp$","nnps","wp$","cd","pos","jjr","rbs","vb","md","vbg","wp","ex","wdt","jjs","cc","to","vbp","nns","vbd","prp","vbn","rbr","pdt","jj","rb","nn","dt","vbz","nnp","`","in"};
+
 extern struct input_sentence_entry input_sentence[SENTENCE_BLOCK_SIZE][DEFAULT_SENTENCE_LENGTH];
 extern char recall_sentence[DEFAULT_SENTENCE_LENGTH][DEFAULT_WORD_LENGTH];
 extern int *lexicon_array_sentence[MAX_LEX_SENTENCE];

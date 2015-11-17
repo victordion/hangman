@@ -1,1 +1,1 @@
-g++ -g -std=c++11 -o HangmanServer HangmanServer.cpp HangmanHandler.cpp machine_algorithm_v2.cpp multi_recall_word.cpp read_KB_word.cpp sentence_automatic_recall.cpp sentence_multi_recall.cpp sentence_read_KB.cpp -lproxygenhttpserver -lfolly -lglog -lgflags -pthread
+g++ -g -std=c++11 -o HangmanServer confab_mutex.cpp HangmanServer.cpp HangmanHandler.cpp machine_algorithm_v2.cpp multi_recall_word.cpp read_KB_word.cpp sentence_automatic_recall.cpp sentence_multi_recall.cpp sentence_read_KB.cpp -lproxygenhttpserver -lfolly -lglog -lgflags -pthread -Wno-write-strings -Wformat=0

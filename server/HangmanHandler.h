@@ -42,9 +42,9 @@ namespace HangmanService {
 
     private:
       HangmanStats* const stats_{nullptr};
-      Guesser guesser_;
+      Guesser  guesser_;
       GameCreator game_creator_;
       std::unique_ptr<folly::IOBuf> body_;
   };
-
+  
 }

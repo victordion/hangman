@@ -24,7 +24,7 @@ using folly::dynamic;
 namespace HangmanService {
 
   HangmanHandler::HangmanHandler(HangmanStats* stats): stats_(stats) {
-
+    std::cout << "New HangmanHandler created." << std::endl;
   }
 
   void HangmanHandler::onRequest(std::unique_ptr<HTTPMessage> headers) noexcept {
