@@ -1,5 +1,19 @@
+/*
+ *  Copyright (c) 2015, Syracuse University.
+ *  All rights reserved.
+ *
+ *  This source code is licensed under the BSD-style license found in the
+ *  LICENSE file in the root directory of this source tree. An additional grant
+ *  of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *  Modified on Nov 17 2015
+ *  By Jianwei Cui
+ *  Also Modified by Syed
+ */
+
 #ifndef _GUESSER_H_
 #define _GUESSER_H_
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -10,11 +24,18 @@
 #include <folly/FBString.h>
 #include <mutex>
 
+/* 
+ * a mutex lives as an external global variable
+ * currently the only remedy solution to integrate the legacy code
+ */
+extern std::mutex mtx;
+
+/*
+ * Legacy function declarations, may need refactoring
+ */
 extern char recall_sentence[2048];
 extern int letter_select_candidate[26];
 extern double letter_select_frequency[26];
-extern std::mutex mtx;
-
 void sentence_confab(int sid);
 void letter_select(std::string str, char &letter);
 void free_input_sentence(int sid);
@@ -22,18 +43,22 @@ int collect_wconf_results(std::string str, int word_count);
 void clear_sentence(int sid);
 
 namespace HangmanService {
+/*
+ *  Each HangmanHandler instance will have its own Guesser instance.
+ *  Because HTTP is handled in a multi-threading way, and guess() 
+ *  invokes legacy functions that modifies global variables, a lock on
+ *  a global mutex is mandatory.
+ */
 class Guesser {
-  private:
 	public:
 		Guesser() {
-      std::cout << "*** New Guesser created." << std::endl;
+      std::cout << "[INFO] *** New Guesser created." << std::endl;
 		}
 
 		folly::fbstring guess(folly::fbstring masked_sentence, std::vector<folly::fbstring> wrong_guesses) {
       std::lock_guard<std::mutex> lck(mtx);
 			std::vector<char> wrong_chars;
 			std::unordered_set<folly::fbstring> wrong_sentences;
-
 			folly::fbstring guessed_sentence = "";
 			clear_sentence(0);
 
@@ -99,7 +124,6 @@ class Guesser {
 				{
 					char guessed_letter;
 					letter_select(folly::toStdString(masked_sentence), guessed_letter);
-					//char guessed_letter = letter_select(masked_sentence);
 
 					return folly::fbstring(1, guessed_letter); 
 				}
@@ -109,9 +133,6 @@ class Guesser {
 			}
 		}
 };
-
-
-
-}
+} // end namespace HangmanService
 
 #endif

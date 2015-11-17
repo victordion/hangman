@@ -1,1 +1,18 @@
-g++ -g -std=c++11 -o HangmanServer confab_mutex.cpp HangmanServer.cpp HangmanHandler.cpp machine_algorithm_v2.cpp multi_recall_word.cpp read_KB_word.cpp sentence_automatic_recall.cpp sentence_multi_recall.cpp sentence_read_KB.cpp -lproxygenhttpserver -lfolly -lglog -lgflags -pthread -Wno-write-strings -Wformat=0
+#!/bin/bash
+
+echo "BUILD script starts..."
+mkdir -p ./bin/
+
+src="confab_mutex.cpp HangmanServer.cpp HangmanHandler.cpp machine_algorithm_v2.cpp multi_recall_word.cpp read_KB_word.cpp sentence_automatic_recall.cpp sentence_multi_recall.cpp sentence_read_KB.cpp"
+
+out="./bin/HangmanServer"
+
+warning_flags="-Wno-write-strings -Wformat=0"
+
+link_flags="-lproxygenhttpserver -lfolly -lglog -lgflags"
+
+extra_flags="-pthread"
+
+g++ -std=c++11 -o $out $src $link_flags $warning_flags $extra_flags
+
+#g++ -g -std=c++11 -o ./bin/HangmanServer confab_mutex.cpp HangmanServer.cpp HangmanHandler.cpp machine_algorithm_v2.cpp multi_recall_word.cpp read_KB_word.cpp sentence_automatic_recall.cpp sentence_multi_recall.cpp sentence_read_KB.cpp -lproxygenhttpserver -lfolly -lglog -lgflags -pthread -Wno-write-strings -Wformat=0

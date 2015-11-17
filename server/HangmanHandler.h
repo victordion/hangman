@@ -7,6 +7,7 @@
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  *  Modified on Oct 1 2015
+ *  Modified on Nov 17 2015
  *  By Jianwei Cui
  */
 #pragma once

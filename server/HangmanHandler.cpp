@@ -7,6 +7,7 @@
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  *  Modified on Oct 1 2015
+ *  Modified on Nov 17 2015
  *  By Jianwei Cui
  */
 
@@ -24,18 +25,16 @@ using folly::dynamic;
 namespace HangmanService {
 
   HangmanHandler::HangmanHandler(HangmanStats* stats): stats_(stats) {
-    std::cout << "New HangmanHandler created." << std::endl;
   }
 
   void HangmanHandler::onRequest(std::unique_ptr<HTTPMessage> headers) noexcept {
-    std::cout << "Client IP:" << headers->getClientIP() << std::endl;
-    std::cout << "Client Port:" << headers->getClientPort() << std::endl;
-    std::cout << "OnRequest functions is called." << std::endl;
+    std::cout << "Client Address:" << headers->getClientIP() << " : " << headers->getClientPort() << std::endl;
+    // std::cout << "OnRequest functions is called." << std::endl;
     stats_->recordRequest();
   }
 
   void HangmanHandler::onBody(std::unique_ptr<folly::IOBuf> body) noexcept {
-    std::cout << "Onbody functions is called." << std::endl;
+    // std::cout << "Onbody functions is called." << std::endl;
     if (body_) {	
       body_->prependChain(std::move(body));
     } else {
