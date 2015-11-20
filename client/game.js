@@ -22,6 +22,8 @@ function checkGuess(true_sentence, masked_sentence, guessed_content, wrong_guess
       feedback = 'Congratulations! Sentence guess completed!';
       masked_sentence = true_sentence;
       score += num_masked;
+      /* Actually it is a correct guess, but last guess, so add it anyway */
+      wrong_guesses.push(guessed_content);
     }
     else {
       feedback = "Incorrect sentence guess: " + guessed_content;
